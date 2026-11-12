@@ -138,29 +138,13 @@
 		<div class="data-card">
 			<h3>🕹️ Arranger Style Variations</h3>
 			<div class="variation-rack">
-				<button class="btn-var active" onclick="setVariation(0)">ARR A</button>
-				<button class="btn-var" onclick="setVariation(1)">ARR B</button>
-				<button class="btn-var" onclick="setVariation(2)">ARR C</button>
-				<button class="btn-var" onclick="setVariation(3)">ARR D</button>			
-			</div>
-			<div class="variation-rack" style="margin-top: 8px;">
-				<button class="btn-var" onclick="setVariation(4)">ARR A_1</button>	
-				<button class="btn-var" onclick="setVariation(5)">ARR B_1</button>			
-				<button class="btn-var" onclick="setVariation(6)">ARR C_1</button>
-				<button class="btn-var" onclick="setVariation(7)">ARR D_1</button>
-			</div>
-			<h3>Drum Fills and Breaks</h3>
-			<div class="variation-rack">
-				<button onclick="playDrumFill('FILA')">FILA</button>
-				<button onclick="playDrumFill('FILB')">FILB</button>
-				<button onclick="playDrumFill('FILC')">FILC</button>
-				<button onclick="playDrumFill('FILD')">FILD</button>
-			</div>
-			<div class="variation-rack">
-				<button onclick="playDrumFill('BRKA')">BRKA</button>
-				<button onclick="playDrumFill('BRKB')">BRKB</button>
-				<button onclick="playDrumFill('BRKC')">BRKC</button>
-				<button onclick="playDrumFill('BRKD')">BRKD</button>
+				<button class="btn-var active" onclick="setVariationLetter(0)">ARR A</button>
+				<button class="btn-var" onclick="setVariationLetter(1)">ARR B</button>
+				<button class="btn-var" onclick="setVariationLetter(2)">ARR C</button>
+				<button class="btn-var" onclick="setVariationLetter(3)">ARR D</button>
+				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">ARR_X</button>
+				<button id="btn-fil-x" onclick="playFillX()">FIL_X</button>
+				<button id="btn-brk-x" onclick="playBreakX()">BRK_X</button>
 			</div>
 			<p><label><input type="checkbox" checked id="auto-fill"> AutoFill</label></p>
 		</div>			
@@ -222,6 +206,7 @@
             for (const name of ['drums', 'bass', 'chords', 'voice1', 'voice2']) mixer[name].connect(mixer.master);
             return mixer;
         }
+        const mixerUpdaters = {};
         for (const name of Object.keys(mixerState)) {
             const slider = document.getElementById(`volume-${name}`);
             const mute = document.getElementById(`mute-${name}`);
@@ -230,6 +215,7 @@
                 mute.setAttribute('aria-pressed', String(mixerState[name].muted));
                 if (mixer) mixer[name].gain.setValueAtTime(mixerState[name].muted ? 0 : mixerState[name].volume, audioCtx.currentTime);
             };
+            mixerUpdaters[name] = () => { slider.value = Math.round(mixerState[name].volume * 100); update(); };
             slider.addEventListener('input', () => { mixerState[name].volume = Number(slider.value) / 100; update(); });
             mute.addEventListener('click', () => { mixerState[name].muted = !mixerState[name].muted; update(); });
         }
@@ -250,6 +236,7 @@
 		let barDuration = null;
 		let barStartTime = null;
 		let currentVariation = 0;
+		let altVariation = false;
         let introEnding = 2;
 		let currentDrumKey = null;
 		let endingScheduled = false;
@@ -289,7 +276,7 @@
         document.getElementById('btn-link-dir').addEventListener('click', async () => {
             try {
                 if (!window.showDirectoryPicker) throw new Error('Folder access requires a supported Chromium browser in a secure context.');
-                const root = await window.showDirectoryPicker();
+                const root = await window.showDirectoryPicker({ mode: 'readwrite' });
                 document.getElementById('btn-link-dir').disabled = true;
                 if (isPlaying) stopArranger();
                 rootDirHandle = root;
@@ -304,10 +291,10 @@
                 document.getElementById('btn-scan-sf2').disabled = false;
                 document.getElementById('txt-dir').innerText = `Linked: ${rootDirHandle.name}/`;
                 getAudio();
-                document.getElementById('kst-items').replaceChildren();
-                document.getElementById('file-display').style.display = "block";
-                const totalFiles = await scanStyleFolderDeep(root);
-                if (!totalFiles) document.getElementById('kst-items').textContent = 'No KST styles found.';
+                styleGroups = new Map();
+                styleView.open = null;
+                await scanStyleFolderDeep(root);
+                renderStyles();
                 voices.scan(root);
             } catch (err) {
                 if (err.name !== 'AbortError') {
@@ -319,13 +306,14 @@
             }
         });
 
+        let styleGroups = new Map();
+        const styleView = { open: null };
+
         async function scanStyleFolderDeep(folderHandle, currentPath = "") {
             let count = 0;
-            const container = document.getElementById('kst-items');
             const entries = [];
             for await (const entry of folderHandle.values()) entries.push(entry);
             entries.sort((a, b) => a.name.localeCompare(b.name));
-            let group;
             for (const entry of entries) {
                 if (entry.kind === 'directory') {
                     const subPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
@@ -333,38 +321,43 @@
                 } else if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.kst')) {
                     count++;
                     const genre = currentPath || "Root";
-                    if (!group) {
-                        group = document.createElement('div');
-                        group.className = 'group-label';
-                        group.textContent = genre;
-                        container.appendChild(group);
-                    }
-                    const button = document.createElement('button');
-                    button.textContent = entry.name;
-                    button.onclick = () => {
-                        if (styleLoading) return;
-                        if (isPlaying) stopArranger();
-                        selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
-                        highlightSelection(button);
-                        document.getElementById('btn-parse').click();
-                    };
-                    container.appendChild(button);
+                    if (!styleGroups.has(genre)) styleGroups.set(genre, []);
+                    styleGroups.get(genre).push(entry);
                 }
             }
             return count;
         }
 
-        function highlightSelection(el) {
-            document.querySelectorAll('#kst-items button').forEach(button => button.classList.remove('selected'));
-            el.classList.add('selected');
+        function selectStyle(entry, genre) {
+            if (styleLoading) return Promise.resolve();
+            if (isPlaying) stopArranger();
+            selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
+            highlightSelection();
+            return loadSelectedStyle();
+        }
+
+        function renderStyles() {
+            const groups = [...styleGroups].sort((a, b) => a[0].localeCompare(b[0])).map(([name, entries]) => ({
+                name,
+                items: entries.map(entry => ({
+                    label: entry.name, title: `${name}/${entry.name}`,
+                    selected: selectedStyleInfo?.handle === entry,
+                    onClick: () => selectStyle(entry, name)
+                }))
+            }));
+            window.renderTwoLevel(document.getElementById('kst-items'), styleView, groups, 'No KST styles found.');
+        }
+
+        function highlightSelection() {
             document.getElementById('style-name').textContent = selectedStyleInfo.name.replace(/\.kst$/i, '');
             document.getElementById('style-category').textContent = selectedStyleInfo.path;
             document.getElementById('btn-play').disabled = true;
             document.getElementById('btn-parse').disabled = false;
             logger(`Target file targeted: ${selectedStyleInfo.name}`);
+            renderStyles();
         }
 
-        document.getElementById('btn-parse').addEventListener('click', async () => {
+        async function loadSelectedStyle() {
             if (!selectedStyleInfo || styleLoading) return;
             if (isPlaying) stopArranger();
             styleLoading = true;
@@ -389,7 +382,8 @@
                 document.getElementById('btn-parse').disabled = false;
                 document.querySelectorAll('#kst-items button').forEach(button => button.disabled = false);
             }
-        });
+        }
+        document.getElementById('btn-parse').addEventListener('click', loadSelectedStyle);
 
         async function executeFixedBlockKshpParse(buffer) {
             const view = new DataView(buffer);
@@ -734,11 +728,22 @@
 		window.playDrumFill = function(key) {
 			if (scheduleDrumTransition(currentDrumKey, key)) logger(`Playing drum ${key}.`);
 		};
+		window.playFillX = () => playDrumFill(fills[currentVariation % 4]);
+		window.playBreakX = () => playDrumFill(breaks[currentVariation % 4]);
+		window.setVariationLetter = letter => setVariation(letter + (altVariation ? 4 : 0));
+		window.toggleAltVariation = function() {
+			altVariation = !altVariation;
+			updateVariationButtons();
+			if (isPlaying && !endingScheduled) setVariation((currentVariation % 4) + (altVariation ? 4 : 0));
+		};
 
 		function updateVariationButtons() {
 			document.querySelectorAll('.btn-var').forEach((btn, index) => {
-				btn.classList.toggle('active', index === currentVariation);
+				btn.classList.toggle('active', index === currentVariation % 4);
 			});
+			const altButton = document.getElementById('btn-arr-x');
+			altButton.setAttribute('aria-pressed', String(altVariation));
+			altButton.textContent = altVariation ? 'ARR_X (_1)' : 'ARR_X';
 		}
 
 		function changeStyleChord(detectedType, detectedRoot, detectedBass) {
@@ -833,6 +838,7 @@
 			barDuration = 4 * (60 / tempo) / rate;
 			barStartTime = startTime;
 			currentVariation = 0;
+			altVariation = false;
 			currentDrumKey = intros[introEnding];
 			endingScheduled = false;
 			currentChordType = currentChordRoot = currentBassRoot = null;
@@ -1103,6 +1109,99 @@
             if (state === 'melody') el.classList.add('active-melody');
             if (state === 'chord') el.classList.add('active-chord');
         }
+
+
+        // Registrations: 20 JSON snapshots stored in <root>/REGISTRATIONS, with localStorage as fallback.
+        const regSelect = document.getElementById('reg-select');
+        const regName = n => `REG_${String(n).padStart(2, '0')}.json`;
+        async function regFolder(create) {
+            return rootDirHandle ? rootDirHandle.getDirectoryHandle('REGISTRATIONS', { create }) : null;
+        }
+        async function readRegistration(n) {
+            try {
+                const folder = await regFolder(false);
+                if (folder) return await (await (await folder.getFileHandle(regName(n))).getFile()).text();
+            } catch (error) { if (error.name !== 'NotFoundError') logger(`Registration read error: ${error.message}`); }
+            return localStorage.getItem(`evm-reg-${n}`);
+        }
+        async function refreshRegistrations() {
+            for (let n = 1; n <= 20; n++) {
+                const saved = await readRegistration(n);
+                regSelect.options[n - 1].textContent = `Reg ${n}${saved ? ' ●' : ''}`;
+            }
+        }
+        function captureRegistration() {
+            return {
+                version: 1,
+                style: selectedStyleInfo ? { path: selectedStyleInfo.path, name: selectedStyleInfo.name } : null,
+                performance: {
+                    key: keyInput.value, tempoShift: Number(tempoInput.value), autoFill: document.getElementById('auto-fill').checked,
+                    introEnding, variation: currentVariation % 4, alt: altVariation
+                },
+                mixer: JSON.parse(JSON.stringify(mixerState)),
+                voices: voices.getState()
+            };
+        }
+        async function saveRegistration(n) {
+            const text = JSON.stringify(captureRegistration(), null, 2);
+            let where = 'browser storage';
+            try {
+                const folder = await regFolder(true);
+                if (folder) {
+                    const writable = await (await folder.getFileHandle(regName(n), { create: true })).createWritable();
+                    await writable.write(text);
+                    await writable.close();
+                    where = `REGISTRATIONS/${regName(n)}`;
+                } else localStorage.setItem(`evm-reg-${n}`, text);
+            } catch (error) {
+                logger(`Could not write registration file (${error.message}); saved in browser storage instead.`);
+                localStorage.setItem(`evm-reg-${n}`, text);
+            }
+            logger(`Registration ${n} saved to ${where}.`);
+            refreshRegistrations();
+        }
+        async function recallRegistration(n) {
+            const text = await readRegistration(n);
+            if (!text) return logger(`Registration ${n} is empty.`);
+            let reg;
+            try { reg = JSON.parse(text); if (reg.version !== 1 || !Array.isArray(reg.voices?.voices) || !reg.mixer || !reg.performance) throw new Error('unrecognised format'); }
+            catch (error) { return logger(`Registration ${n} is invalid: ${error.message}`); }
+            const missing = [];
+            for (const name of Object.keys(mixerState)) {
+                const saved = reg.mixer[name];
+                if (!saved) continue;
+                mixerState[name].volume = Math.min(1, Math.max(0, Number(saved.volume) || 0));
+                mixerState[name].muted = Boolean(saved.muted);
+                mixerUpdaters[name]();
+            }
+            const perf = reg.performance;
+            const previousTuning = keyInput.value + tempoInput.value;
+            if (noteNames.includes(perf.key)) keyInput.value = perf.key;
+            tempoInput.value = Math.min(6, Math.max(-6, Number(perf.tempoShift) || 0));
+            document.getElementById('lbl-tempo').innerText = `Tempo Shift Step: ${tempoInput.value}`;
+            document.getElementById('auto-fill').checked = Boolean(perf.autoFill);
+            const intro = Number(perf.introEnding);
+            if (intro >= 0 && intro < 3) document.querySelector(`.intro-choice[data-intro="${intro}"]`).click();
+            const alt = Boolean(perf.alt);
+            missing.push(...voices.setState(reg.voices));
+            if (reg.style) {
+                const entry = styleGroups.get(reg.style.path)?.find(candidate => candidate.name === reg.style.name);
+                if (!entry) missing.push(`Style: ${reg.style.path}/${reg.style.name}`);
+                else if (selectedStyleInfo?.handle !== entry) await selectStyle(entry, reg.style.path);
+            }
+            if (isPlaying && !endingScheduled) {
+                if (keyInput.value + tempoInput.value !== previousTuning) restartArrangerEngine();
+                altVariation = alt;
+                setVariation((Number(perf.variation) || 0) % 4 + (alt ? 4 : 0));
+            } else {
+                altVariation = alt;
+                updateVariationButtons();
+            }
+            logger(`Registration ${n} recalled.${missing.length ? ` Not found in scanned folder: ${missing.join('; ')}` : ''}`);
+        }
+        document.getElementById('btn-reg-save').addEventListener('click', () => saveRegistration(Number(regSelect.value)));
+        document.getElementById('btn-reg-recall').addEventListener('click', () => recallRegistration(Number(regSelect.value)));
+        refreshRegistrations();
 
         window.setVariation = function(varNo) {
 			const targetKey = variations[varNo];

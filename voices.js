@@ -103,7 +103,7 @@ export function createVoices(getAudio, getMixer, log) {
                 voice.mode = null;
                 applyEffects(voice);
                 $(`voice${index + 1}-name`).textContent = patch.name;
-                $(`voice${index + 1}-browser`).querySelectorAll('button[data-patch]').forEach(button => button.classList.toggle('selected', button.dataset.patch === item.path + '\n' + patch.key));
+                render();
                 status(`Voice ${index + 1}: ${patch.name} (${item.path})`);
                 showSettings();
             } catch (error) {
@@ -118,35 +118,26 @@ export function createVoices(getAudio, getMixer, log) {
             const voice = voices[selected];
             voice[key] = key === 'octave' || key === 'transpose' ? Number($(id).value) : $(id).value;
             if (key !== 'octave' && key !== 'transpose') applyEffects(voice);
-            render([]);
             showSettings();
         });
     }
     [0, 1].forEach(index => $(`select-voice${index + 1}`).addEventListener('click', () => { selected = index; showSettings(); }));
 
-    function render(items) {
+    const views = [{ open: null }, { open: null }];
+    let lastItems = [];
+    function render(items = lastItems) {
+        lastItems = items;
         voices.forEach((voice, index) => {
-            const browser = $(`voice${index + 1}-browser`);
-            browser.replaceChildren();
-            const list = document.createElement('div');
-            list.className = 'patch-list';
-            if (!items.length) list.textContent = 'Connect a folder and scan for SoundFonts.';
-            for (const item of items) {
-                const group = document.createElement('div');
-                group.className = 'group-label';
-                group.textContent = item.path;
-                list.appendChild(group);
-                for (const patch of item.patches) {
-                    const button = document.createElement('button');
-                    button.dataset.patch = item.path + '\n' + patch.key;
-                    button.textContent = patch.name;
-                    button.title = `Bank ${patch.bankMSB}, program ${patch.program}${patch.isGMGSDrum ? ' (drums)' : ''}`;
-                    button.classList.toggle('selected', voice.file === item && voice.patch === patch);
-                    button.addEventListener('click', () => load(index, item, patch));
-                    list.appendChild(button);
-                }
-            }
-            browser.appendChild(list);
+            const groups = items.map(item => ({
+                name: item.path,
+                items: item.patches.map(patch => ({
+                    label: patch.name,
+                    title: `Bank ${patch.bankMSB}, program ${patch.program}${patch.isGMGSDrum ? ' (drums)' : ''}`,
+                    selected: voice.file === item && voice.patch === patch,
+                    onClick: () => load(index, item, patch)
+                }))
+            }));
+            window.renderTwoLevel($(`voice${index + 1}-browser`), views[index], groups, 'Connect a folder and scan for SoundFonts.');
         });
     }
     async function readItem(getFile, path) {
@@ -208,7 +199,37 @@ export function createVoices(getAudio, getMixer, log) {
     showSettings();
     return {
         scan,
-        cancelScan() { scanGeneration++; render([]); },
+        cancelScan() { scanGeneration++; views.forEach(view => { view.open = null; }); render([]); },
+        getState() {
+            return {
+                selected,
+                voices: voices.map(voice => ({
+                    soundFont: voice.file ? voice.file.path : null,
+                    patch: voice.patch ? { key: voice.patch.key, name: voice.patch.name } : null,
+                    octave: voice.octave, transpose: voice.transpose, effect: voice.effect,
+                    lowFrequency: voice.lowFrequency, lowGain: voice.lowGain,
+                    highFrequency: voice.highFrequency, highGain: voice.highGain
+                }))
+            };
+        },
+        setState(state) {
+            const missing = [];
+            state.voices.forEach((saved, index) => {
+                const voice = voices[index];
+                for (const key of ['octave', 'transpose', 'effect', 'lowFrequency', 'lowGain', 'highFrequency', 'highGain']) {
+                    if (saved[key] !== undefined) voice[key] = saved[key];
+                }
+                applyEffects(voice);
+                if (!saved.soundFont) return;
+                const item = lastItems.find(candidate => candidate.path === saved.soundFont);
+                const patch = item?.patches.find(candidate => candidate.key === saved.patch?.key && candidate.name === saved.patch?.name);
+                if (patch) load(index, item, patch);
+                else missing.push(`Voice ${index + 1}: ${saved.soundFont}`);
+            });
+            selected = state.selected === 1 ? 1 : 0;
+            showSettings();
+            return missing;
+        },
         noteOn(note, velocity) {
             for (const voice of voices) {
                 if (!voice.synth || !voice.patch) continue;
