@@ -4,7 +4,7 @@ body > h1, body > p, body > .box, body > h3, body > .log { display: none; }
 button, select, input { font: inherit; }
 button { cursor: pointer; }
 button:disabled, select:disabled { opacity: .48; cursor: not-allowed; }
-.console { min-width: 760px; max-width: 1600px; margin: auto; }
+.console { min-width: 760px; max-width: 1500px; margin: auto; }
 .topline { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px 8px; color: #2c4445; font-size: 11px; font-weight: bold; letter-spacing: .12em; }
 .console-grid { display: grid; grid-template-columns: 19% 21% 20% 20% 20%; gap: 5px; }
 .panel { min-width: 0; }

@@ -6,7 +6,7 @@
     const consoleElement = document.createElement('main');
     consoleElement.className = 'console';
     consoleElement.innerHTML = `
-        <div class="topline"><span>VIBE ARRANGER / EVENT MODULE</span><span>WEB AUDIO PERFORMANCE</span></div>
+        <div class="topline"><span>JAMIN ARRANGER</span><span>A WEB AUDIO VERSION OF THE KETRON EVENT MODULE (EVM)</span></div>
         <div class="console-grid">
             <section class="panel-head" id="head-global"><small>System</small><strong>GLOBAL</strong><select id="reg-select" aria-label="Registration"></select></section>
             <section class="panel-head browse-head" data-browse="style" tabindex="0" role="button"><small>Style / <span id="style-category">No category</span></small><strong id="style-name">SELECT A STYLE</strong><span id="style-tempo"></span> <span id="style-chord"></span></section>

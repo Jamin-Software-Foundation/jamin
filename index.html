@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VibeArranger</title>
+    <title>Jamin Arranger</title>
 	<link rel="icon" type="image/x-icon" href="./favicon.png"> 
 	<link rel="manifest"   href="./web-manifest.json" />		
     <script type="importmap">
@@ -118,7 +118,7 @@
         <input type="range" id="ctrl-tempo" min="-6" max="6" value="0" step="1">
 
         <br><br>
-        <button id="btn-play" style="background: #555; color: #fff;">START ARRANGEMENT</button>
+        <button id="btn-play" style="background: #555; color: #fff;">START</button>
         <button id="btn-stop" style="background: #555; color: #fff;">STOP</button>
     </div>
 	
@@ -142,9 +142,9 @@
 				<button class="btn-var" onclick="setVariationLetter(1)">ARR B</button>
 				<button class="btn-var" onclick="setVariationLetter(2)">ARR C</button>
 				<button class="btn-var" onclick="setVariationLetter(3)">ARR D</button>
-				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">ARR_X</button>
-				<button id="btn-fil-x" onclick="playFillX()">FIL_X</button>
-				<button id="btn-brk-x" onclick="playBreakX()">BRK_X</button>
+				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">VARIATION</button>
+				<button id="btn-fil-x" onclick="playFillX()">FILL</button>
+				<button id="btn-brk-x" onclick="playBreakX()">BREAK</button>
 			</div>
 			<p><label><input type="checkbox" checked id="auto-fill"> AutoFill</label></p>
 		</div>			
@@ -636,6 +636,8 @@
             document.querySelectorAll('.intro-choice').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
         }));
         tempoInput.addEventListener('input', (e) => {
+			const rate = Math.pow(2, parseInt(e.target.value, 10) / 12);
+			document.getElementById('style-tempo').textContent = Math.ceil(tempo * rate) + " BPM";
             document.getElementById('lbl-tempo').innerText = `Tempo Shift Step: ${e.target.value}`;
             if (isPlaying && !endingScheduled) restartArrangerEngine();
         });
@@ -657,7 +659,7 @@
 					["chords", "0_IN_MAJ_" + getMelodicKey()]
 				])) return;
 				isPlaying = true;
-				e.target.innerHTML = "STOP ARRANGEMENT";
+				e.target.innerHTML = "STOP";
 				e.target.style.background = "#00e676"; 				
 				runArrangerPlaybackChannels();
 			}
@@ -920,7 +922,7 @@
 			endingNode = null;
 			isPlaying = false;	
 			const playButton = document.querySelector("#btn-play");			
-			playButton.innerHTML = "START ARRANGEMENT";
+			playButton.innerHTML = "START";
 			playButton.style.background = "#ff3d00"; 			
             logger("Engine tracking stopped.");
         }

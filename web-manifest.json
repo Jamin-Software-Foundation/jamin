@@ -1,9 +1,9 @@
 {
-    "short_name": "vibe-arranger",
-    "name": "Vibe Arranger",
+    "short_name": "jamin-arranger",
+    "name": "Jamin Arranger",
     "version": "1.0",	
     "categories": ["music"],	
-    "description": "Proof of Concept for a Web based Audio Styles Arranger",    
+    "description": "A web audio version of the Ketron Event Module (EVM)",    
     "icons": [
         {
             "src": "./icon-1024x1024.png",
