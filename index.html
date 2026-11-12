@@ -40,6 +40,7 @@
         .control-row label { min-width: 90px; }
         button[aria-pressed="true"] { background: #ff7043; }
 	</style>
+    <link rel="stylesheet" href="./console.css">
 </head>
 <body>
 
@@ -137,29 +138,13 @@
 		<div class="data-card">
 			<h3>🕹️ Arranger Style Variations</h3>
 			<div class="variation-rack">
-				<button class="btn-var active" onclick="setVariation(0)">ARR A</button>
-				<button class="btn-var" onclick="setVariation(1)">ARR B</button>
-				<button class="btn-var" onclick="setVariation(2)">ARR C</button>
-				<button class="btn-var" onclick="setVariation(3)">ARR D</button>			
-			</div>
-			<div class="variation-rack" style="margin-top: 8px;">
-				<button class="btn-var" onclick="setVariation(4)">ARR A_1</button>	
-				<button class="btn-var" onclick="setVariation(5)">ARR B_1</button>			
-				<button class="btn-var" onclick="setVariation(6)">ARR C_1</button>
-				<button class="btn-var" onclick="setVariation(7)">ARR D_1</button>
-			</div>
-			<h3>Drum Fills and Breaks</h3>
-			<div class="variation-rack">
-				<button onclick="playDrumFill('FILA')">FILA</button>
-				<button onclick="playDrumFill('FILB')">FILB</button>
-				<button onclick="playDrumFill('FILC')">FILC</button>
-				<button onclick="playDrumFill('FILD')">FILD</button>
-			</div>
-			<div class="variation-rack">
-				<button onclick="playDrumFill('BRKA')">BRKA</button>
-				<button onclick="playDrumFill('BRKB')">BRKB</button>
-				<button onclick="playDrumFill('BRKC')">BRKC</button>
-				<button onclick="playDrumFill('BRKD')">BRKD</button>
+				<button class="btn-var active" onclick="setVariationLetter(0)">ARR A</button>
+				<button class="btn-var" onclick="setVariationLetter(1)">ARR B</button>
+				<button class="btn-var" onclick="setVariationLetter(2)">ARR C</button>
+				<button class="btn-var" onclick="setVariationLetter(3)">ARR D</button>
+				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">ARR_X</button>
+				<button id="btn-fil-x" onclick="playFillX()">FIL_X</button>
+				<button id="btn-brk-x" onclick="playBreakX()">BRK_X</button>
 			</div>
 			<p><label><input type="checkbox" checked id="auto-fill"> AutoFill</label></p>
 		</div>			
@@ -198,37 +183,30 @@
     <h3>System Output Log</h3>
     <div id="log-window" class="log">Engine waiting to initialize...</div>
 
+	<script src="./console-layout.js"></script>
 	<script type="module">
-		import { WorkletSynthesizer } from "./spessasynth/spessasynth_lib.js";
-		import { MIDIUtils } from "spessasynth_core";
+        import { createVoices } from "./voices.js";
 
-		const sf2Input = document.getElementById("sf2-input");
-		const sf2PlayBtn = document.getElementById("sf2-play-btn");
-		const statusDiv = document.getElementById("status");
-		
-		let synth = null;
         let audioCtx = null;
         let mixer = null;
-        let workletModule = null;
-        let soundFontQueue = Promise.resolve();
-        let soundFontRequest = 0;
-        let soundFontHandles = [];
-        let scanRequest = 0;
-        let synthEffectMode = null;
-
-        const mixerState = Object.fromEntries(['drums', 'bass', 'chords', 'synth', 'master'].map(name => [name, { volume: 1, muted: false }]));
+        const mixerState = Object.fromEntries(['drums', 'bass', 'chords', 'voice1', 'voice2', 'master'].map(name => [name, { volume: 1, muted: false }]));
+        function getAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
         function ensureMixer() {
             if (mixer) return mixer;
+            getAudio();
             mixer = {};
             for (const name of Object.keys(mixerState)) {
                 mixer[name] = audioCtx.createGain();
                 mixer[name].gain.value = mixerState[name].muted ? 0 : mixerState[name].volume;
             }
             mixer.master.connect(audioCtx.destination);
-            for (const name of ['drums', 'bass', 'chords', 'synth']) mixer[name].connect(mixer.master);
+            for (const name of ['drums', 'bass', 'chords', 'voice1', 'voice2']) mixer[name].connect(mixer.master);
             return mixer;
         }
-
+        const mixerUpdaters = {};
         for (const name of Object.keys(mixerState)) {
             const slider = document.getElementById(`volume-${name}`);
             const mute = document.getElementById(`mute-${name}`);
@@ -237,168 +215,19 @@
                 mute.setAttribute('aria-pressed', String(mixerState[name].muted));
                 if (mixer) mixer[name].gain.setValueAtTime(mixerState[name].muted ? 0 : mixerState[name].volume, audioCtx.currentTime);
             };
+            mixerUpdaters[name] = () => { slider.value = Math.round(mixerState[name].volume * 100); update(); };
             slider.addEventListener('input', () => { mixerState[name].volume = Number(slider.value) / 100; update(); });
             mute.addEventListener('click', () => { mixerState[name].muted = !mixerState[name].muted; update(); });
         }
-
-        function applySynthEffects(target) {
-            const effect = document.getElementById('effect-type').value;
-            const xg = effect === 'symphonic';
-            document.getElementById('gs-eq').disabled = xg;
-            if (!target) return;
-            const mode = xg ? 'xg' : 'gs';
-            if (synthEffectMode !== mode) {
-                target.systemExclusive(xg ? MIDIUtils.xg(0, 0, 126, [0]) : MIDIUtils.gs(64, 0, 127, [0]));
-                synthEffectMode = mode;
-            }
-            if (xg) {
-                target.systemExclusive(MIDIUtils.xg(3, 0, 0, [0x44, 0]));
-                target.systemExclusive(MIDIUtils.xg(3, 0, 12, [0]));
-            } else {
-                const type = Number(effect);
-                target.systemExclusive(MIDIUtils.gs(64, 3, 0, [type >> 8, type & 127]));
-                target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x22, [type ? 1 : 0]));
-                target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x20, [1]));
-                applyEqualizer(target);
-            }
-        }
-
-        function applyEqualizer(target) {
-            if (!target || document.getElementById('effect-type').value === 'symphonic') return;
-            const values = [
-                Number(document.getElementById('eq-low-frequency').value),
-                Number(document.getElementById('eq-low-gain').value) + 64,
-                Number(document.getElementById('eq-high-frequency').value),
-                Number(document.getElementById('eq-high-gain').value) + 64
-            ];
-            values.forEach((value, address) => target.systemExclusive(MIDIUtils.gs(64, 2, address, [value])));
-        }
-        document.getElementById('effect-type').addEventListener('change', () => applySynthEffects(synth));
-        for (const id of ['eq-low-frequency', 'eq-low-gain', 'eq-high-frequency', 'eq-high-gain']) {
-            document.getElementById(id).addEventListener('input', () => {
-                document.getElementById('eq-low-output').textContent = `${document.getElementById('eq-low-gain').value} dB`;
-                document.getElementById('eq-high-output').textContent = `${document.getElementById('eq-high-gain').value} dB`;
-                applyEqualizer(synth);
-            });
-        }
-
-        function loadSoundFont(getFile) {
-            const request = ++soundFontRequest;
-            soundFontQueue = soundFontQueue.then(async () => {
-                if (request !== soundFontRequest) return;
-                let newSynth = null;
-                statusDiv.innerText = "Status: Reading SoundFont...";
-                sf2PlayBtn.disabled = true;
-                try {
-                const file = await getFile();
-				const arrayBuffer = await file.arrayBuffer();
-				if (!audioCtx) {
-					audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-				}
-                ensureMixer();
-                if (!synth) {
-                    if (!workletModule) workletModule = audioCtx.audioWorklet.addModule("./spessasynth/spessasynth_processor.min.js").catch(error => { workletModule = null; throw error; });
-                    await workletModule;
-                    newSynth = new WorkletSynthesizer(audioCtx, {coreUrl: "./spessasynth/spessasynth_core.js", fflateUrl: "./spessasynth/fflate.js", stbVorbisUrl: "./spessasynth/stb-vorbis.js"});
-                    await newSynth.isReady;
-                }
-                const target = synth || newSynth;
-                await target.soundBankManager.addSoundBank(arrayBuffer, 'selected-soundfont');
-                synthEffectMode = null;
-                applySynthEffects(target);
-                if (newSynth) {
-                    newSynth.connect(mixer.synth);
-                    synth = newSynth;
-                }
-                if (request !== soundFontRequest) return;
-				statusDiv.innerText = `Status: Ready! Loaded "${file.name}"`;
-				sf2PlayBtn.disabled = false;
-			} catch (error) {
-                if (newSynth && newSynth !== synth) newSynth.destroy();
-				console.error("Initialization Failed:", error);
-                if (request === soundFontRequest) {
-                    statusDiv.innerText = `SoundFont error: ${error.message}`;
-                    sf2PlayBtn.disabled = !synth;
-                }
-			}
-            });
-            return soundFontQueue;
-        }
-		sf2Input.addEventListener("change", (event) => {
-			const file = event.target.files[0];
-			if (file) loadSoundFont(() => Promise.resolve(file));
-		});
-
-        document.getElementById('btn-scan-sf2').addEventListener('click', async () => {
-            const root = rootDirHandle;
-            if (!root) return;
-            const request = ++scanRequest;
-            const picker = document.getElementById('sf2-picker');
-            const status = document.getElementById('sf2-scan-status');
-            picker.disabled = true;
-            status.textContent = 'Scanning for SoundFonts...';
-            const found = [];
-            async function scan(folder, path = '') {
-                for await (const entry of folder.values()) {
-                    const entryPath = path ? `${path}/${entry.name}` : entry.name;
-                    if (entry.kind === 'directory') await scan(entry, entryPath);
-                    else if (entry.kind === 'file' && /\.sf2$/i.test(entry.name)) found.push({ handle: entry, path: entryPath });
-                }
-            }
-            try {
-                await scan(root);
-                if (request !== scanRequest || root !== rootDirHandle) return;
-                found.sort((a, b) => a.path.localeCompare(b.path));
-                soundFontHandles = found;
-                picker.replaceChildren();
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = found.length ? 'Select a SoundFont' : 'No SoundFonts found';
-                picker.appendChild(placeholder);
-                found.forEach((item, index) => {
-                    const option = document.createElement('option');
-                    option.value = String(index);
-                    option.textContent = item.path;
-                    picker.appendChild(option);
-                });
-                picker.disabled = !found.length;
-                status.textContent = `Found ${found.length} SoundFont${found.length === 1 ? '' : 's'}.`;
-            } catch (error) {
-                if (request !== scanRequest || root !== rootDirHandle) return;
-                soundFontHandles = [];
-                status.textContent = `SoundFont scan failed: ${error.message}`;
-                console.error('SoundFont scan failed:', error);
-            }
-        });
-        document.getElementById('sf2-picker').addEventListener('change', event => {
-            if (event.target.value === '') return;
-            const item = soundFontHandles[Number(event.target.value)];
-            if (item) loadSoundFont(() => item.handle.getFile());
+        const voices = createVoices(getAudio, ensureMixer, logger);
+        document.getElementById('btn-scan-sf2').addEventListener('click', () => {
+            if (rootDirHandle) voices.scan(rootDirHandle);
         });
 
-		sf2PlayBtn.addEventListener("click", async () => {
-			if (!synth || !audioCtx) return;
-
-			// Browser unlock mechanism
-			if (audioCtx.state === "suspended") {
-				await audioCtx.resume();
-			}
-
-			statusDiv.innerText = "Status: Playing Note C4...";
-			
-			synth.programChange(0, 0); 	// Set General MIDI channel settings: Program 0 = Acoustic Grand Piano					
-			synth.noteOn(0, 60, 127);	// Attack: Note 60 = Middle C, 127 = Maximum Strike Velocity
-
-			setTimeout(() => {
-				synth.noteOff(0, 60);
-				statusDiv.innerText = "Status: Note released.";
-			}, 1200);
-		});
-	
 		let variationRequested = false;
         let rootDirHandle = null;
-        let styleDirHandle = null;
         let selectedStyleInfo = null;
+        let styleLoading = false;
 		
 		let currentChordRoot = null;
 		let currentBassRoot = null;
@@ -407,6 +236,8 @@
 		let barDuration = null;
 		let barStartTime = null;
 		let currentVariation = 0;
+		let altVariation = false;
+        let introEnding = 2;
 		let currentDrumKey = null;
 		let endingScheduled = false;
 		let endingNode = null;
@@ -435,113 +266,124 @@
 
         function logger(msg) {
             const win = document.getElementById('log-window');
-            win.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            const line = document.createElement('div');
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            win.appendChild(line);
             win.scrollTop = win.scrollHeight;
+            document.getElementById('engine-status').textContent = msg;
         }
 
         document.getElementById('btn-link-dir').addEventListener('click', async () => {
             try {
-                rootDirHandle = await window.showDirectoryPicker();
-                scanRequest++;
-                soundFontHandles = [];
+                if (!window.showDirectoryPicker) throw new Error('Folder access requires a supported Chromium browser in a secure context.');
+                const root = await window.showDirectoryPicker({ mode: 'readwrite' });
+                document.getElementById('btn-link-dir').disabled = true;
+                if (isPlaying) stopArranger();
+                rootDirHandle = root;
+                voices.cancelScan();
+                selectedStyleInfo = null;
+                loopAudioBuffers = { drums: {}, bass: {}, chords: {} };
+                document.getElementById('btn-play').disabled = true;
+                document.getElementById('btn-parse').disabled = true;
+                document.getElementById('style-name').textContent = 'SELECT A STYLE';
+                document.getElementById('style-category').textContent = 'No category';
+                document.getElementById('style-tempo').textContent = '';
                 document.getElementById('btn-scan-sf2').disabled = false;
-                const picker = document.getElementById('sf2-picker');
-                picker.replaceChildren();
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = 'Scan the root folder first';
-                picker.appendChild(placeholder);
-                picker.disabled = true;
-                document.getElementById('sf2-scan-status').textContent = 'Scan the connected root folder for .sf2 files.';
                 document.getElementById('txt-dir').innerText = `Linked: ${rootDirHandle.name}/`;
-				
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    logger("Native AudioContext generated successfully.");
-                }				
-                
-                try {
-                    styleDirHandle = await rootDirHandle.getDirectoryHandle('USER_STYLE', { create: false });
-                    logger("Opened '/USER_STYLE' root hierarchy successfully.");
-                    
-                    document.getElementById('kst-items').innerHTML = "";
-                    let totalFiles = await scanStyleFolderDeep(styleDirHandle);
-                    
-                    if (totalFiles > 0) {
-                        document.getElementById('file-display').style.display = "block";
-                    } else {
-                        logger("No real `.kst` files detected. Building a structural mock file for layout testing.");
-                        injectStructuredMockKst();
-                    }
-                } catch(e) {
-                    logger("CRITICAL: Missing structural '/USER_STYLE' folder entry.");
-                }
+                getAudio();
+                styleGroups = new Map();
+                styleView.open = null;
+                await scanStyleFolderDeep(root);
+                renderStyles();
+                voices.scan(root);
             } catch (err) {
-                logger(`Access Refused: ${err.message}`);
+                if (err.name !== 'AbortError') {
+                    document.getElementById('txt-dir').textContent = `Folder error: ${err.message}`;
+                    logger(`Folder error: ${err.message}`);
+                }
+            } finally {
+                document.getElementById('btn-link-dir').disabled = false;
             }
         });
 
+        let styleGroups = new Map();
+        const styleView = { open: null };
+
         async function scanStyleFolderDeep(folderHandle, currentPath = "") {
             let count = 0;
-            const container = document.getElementById('kst-items');
-
-            for await (const entry of folderHandle.values()) {
+            const entries = [];
+            for await (const entry of folderHandle.values()) entries.push(entry);
+            entries.sort((a, b) => a.name.localeCompare(b.name));
+            for (const entry of entries) {
                 if (entry.kind === 'directory') {
                     const subPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
-                    const nextHandle = await folderHandle.getDirectoryHandle(entry.name);
-                    count += await scanStyleFolderDeep(nextHandle, subPath);
+                    count += await scanStyleFolderDeep(entry, subPath);
                 } else if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.kst')) {
                     count++;
-                    const div = document.createElement('div');
-                    div.style.padding = "6px"; div.style.cursor = "pointer"; div.style.borderBottom = "1px solid #444";
                     const genre = currentPath || "Root";
-                    div.innerHTML = `<span class="genre-tag">${genre}</span> 📄 ${entry.name}`;
-                    div.onclick = () => {
-                        selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
-                        highlightSelection(div);
-                    };
-                    container.appendChild(div);
+                    if (!styleGroups.has(genre)) styleGroups.set(genre, []);
+                    styleGroups.get(genre).push(entry);
                 }
             }
             return count;
         }
 
-        function injectStructuredMockKst() {
-            document.getElementById('file-display').style.display = "block";
-            const container = document.getElementById('kst-items');
-            const div = document.createElement('div');
-            div.style.padding = "6px"; div.style.cursor = "pointer";
-            div.innerHTML = `<span class="genre-tag">Ballad</span> 📄 CustomGuitars.kst (Simulation Mode)`;
-            div.onclick = () => {
-                selectedStyleInfo = { synthetic: true, name: "CustomGuitars.kst", path: "Ballad" };
-                highlightSelection(div);
-            };
-            container.appendChild(div);
+        function selectStyle(entry, genre) {
+            if (styleLoading) return Promise.resolve();
+            if (isPlaying) stopArranger();
+            selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
+            highlightSelection();
+            return loadSelectedStyle();
         }
 
-        function highlightSelection(el) {
-            Array.from(document.getElementById('kst-items').children).forEach(c => c.style.background = "transparent");
-            el.style.background = "#2a4a32";
+        function renderStyles() {
+            const groups = [...styleGroups].sort((a, b) => a[0].localeCompare(b[0])).map(([name, entries]) => ({
+                name,
+                items: entries.map(entry => ({
+                    label: entry.name, title: `${name}/${entry.name}`,
+                    selected: selectedStyleInfo?.handle === entry,
+                    onClick: () => selectStyle(entry, name)
+                }))
+            }));
+            window.renderTwoLevel(document.getElementById('kst-items'), styleView, groups, 'No KST styles found.');
+        }
+
+        function highlightSelection() {
+            document.getElementById('style-name').textContent = selectedStyleInfo.name.replace(/\.kst$/i, '');
+            document.getElementById('style-category').textContent = selectedStyleInfo.path;
+            document.getElementById('btn-play').disabled = true;
             document.getElementById('btn-parse').disabled = false;
             logger(`Target file targeted: ${selectedStyleInfo.name}`);
+            renderStyles();
         }
 
-        document.getElementById('btn-parse').addEventListener('click', async () => {
-            if (!selectedStyleInfo) return;
+        async function loadSelectedStyle() {
+            if (!selectedStyleInfo || styleLoading) return;
+            if (isPlaying) stopArranger();
+            styleLoading = true;
+            document.getElementById('btn-play').disabled = true;
+            document.getElementById('btn-link-dir').disabled = true;
+            document.getElementById('btn-parse').disabled = true;
+            document.querySelectorAll('#kst-items button').forEach(button => button.disabled = true);
             logger(`Reading file buffer bytes from: ${selectedStyleInfo.name}...`);
             
-            let buffer;
-            if (selectedStyleInfo.synthetic) {
-                buffer = createStructuredKetronBinary();
-            } else {
+            try {
                 const file = await selectedStyleInfo.handle.getFile();
-                buffer = await file.arrayBuffer();
+                const buffer = await file.arrayBuffer();
+                loopAudioBuffers = {drums: {}, bass: {}, chords: {}};
+                await executeFixedBlockKshpParse(buffer);
+            } catch (error) {
+                document.getElementById('style-tempo').textContent = `Load failed: ${error.message}`;
+                logger(`Style load failed: ${error.message}`);
+                console.error('Style load failed:', error);
+            } finally {
+                styleLoading = false;
+                document.getElementById('btn-link-dir').disabled = false;
+                document.getElementById('btn-parse').disabled = false;
+                document.querySelectorAll('#kst-items button').forEach(button => button.disabled = false);
             }
-			
-			loopAudioBuffers = {drums: {},	bass: {}, chords: {}};			
-            
-            executeFixedBlockKshpParse(buffer);
-        });
+        }
+        document.getElementById('btn-parse').addEventListener('click', loadSelectedStyle);
 
         async function executeFixedBlockKshpParse(buffer) {
             const view = new DataView(buffer);
@@ -551,8 +393,10 @@
             for (let i = 0; i < buffer.byteLength - 6; i++) {
                 if (view.getUint8(i) === 0xFF && view.getUint8(i+1) === 0x51 && view.getUint8(i+2) === 0x03) {
                     const microSecs = (view.getUint8(i+3) << 16) | (view.getUint8(i+4) << 8) | view.getUint8(i+5);
-                    extractedBpm = Math.round(60000000 / microSecs);
-                    logger(`🎯 MIDI Tempo chunk verified. Extracted Base Speed: ${extractedBpm} BPM.`);
+                    if (microSecs > 0) {
+                        extractedBpm = Math.round(60000000 / microSecs);
+                        logger(`🎯 MIDI Tempo chunk verified. Extracted Base Speed: ${extractedBpm} BPM.`);
+                    }
                     break;
                 }
             }
@@ -566,13 +410,14 @@
 			
 			let origin = findStringInDecoderlessBuffer(buffer, "/media/USBACK/USER_MODELING/LiveDrum/");
 			
-			if (origin) {
+			if (origin >= 0) {
 				drumFolder = getStringFromBuffer(buffer, origin + 37);
 				for (let f in bassFolder) bassFolder[f] = getStringFromBuffer(buffer, origin + 2542 + (f * 80));	
 				for (let f in chordFolder) chordFolder[f] = getStringFromBuffer(buffer, origin + 3022 + (f * 80));
-			}
+			} else throw new Error('LiveDrum path not found in KST; this style format is not supported.');
 
             document.getElementById('out-tempo').innerText = `${extractedBpm} BPM`;
+            document.getElementById('style-tempo').textContent = `${extractedBpm} BPM`;
             document.getElementById('out-drum').innerText = `USER_MODELING/LiveDrum/${drumFolder}`;
 			
             document.getElementById('out-bass1').innerText = `USER_MODELING/RealBass/${bassFolder[0]}`;
@@ -590,30 +435,6 @@
 			await scanAndLoadBuffers(drumFolder, bassFolder, chordFolder);
         }
 
-        function createStructuredKetronBinary() {
-            const buffer = new ArrayBuffer(400);
-            const view = new DataView(buffer);
-            const encoder = new TextEncoder();
-
-            view.setUint8(20, 0xFF); view.setUint8(21, 0x51); view.setUint8(22, 0x03);
-            view.setUint8(23, 0x07); view.setUint8(24, 0xA1); view.setUint8(25, 0x20);
-
-            const targetKshpStart = 120;
-            view.setUint8(targetKshpStart, 0x4B);   
-            view.setUint8(targetKshpStart+1, 0x53); 
-            view.setUint8(targetKshpStart+2, 0x48); 
-            view.setUint8(targetKshpStart+3, 0x50); 
-
-            const mockDataString = "  RockGroove_V2   HeavyBass_E   CleanStrum_A  ";
-            const encodedBytes = encoder.encode(mockDataString);
-            
-            for (let i = 0; i < encodedBytes.length; i++) {
-                view.setUint8(targetKshpStart + 4 + i, encodedBytes[i]);
-            }
-
-            return buffer;
-        }
-		
 		function getStringFromBuffer(buffer, offset, length = null, encoding = 'utf-8') {
 		  const fullView = new Uint8Array(buffer);
 		  let stringView;
@@ -669,7 +490,7 @@
 			const parts = drumFolder.split("_");
 			const drumTempo = parseInt(parts[parts.length - 1]);
 			
-			if (!tempo || drumTempo != tempo){
+			if (Number.isFinite(drumTempo) && drumTempo > 0 && drumTempo != tempo){
 				logger("Tempo mismatch!!! Using drums tempo " + drumTempo);   
 				tempo = drumTempo;			
 			}
@@ -681,22 +502,19 @@
 			try {
 				drumDirHandle = await userModelingHandle.getDirectoryHandle('LiveDrum', { create: false });	
 			} catch (e) {
-				logger("Missing LiveDrum folder or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing LiveDrum folder: " + e.message);
 			}
 			
 			try {
 				bassDirHandle = await userModelingHandle.getDirectoryHandle('RealBass', { create: false });	
 			} catch (e) {
-				logger("Missing RealBass folder or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing RealBass folder: " + e.message);
 			}
 
 			try {
 				chordDirHandle = await userModelingHandle.getDirectoryHandle('RealChord', { create: false });
 			} catch (e) {
-				logger("Missing RealChord folder or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing RealChord folder: " + e.message);
 			}			
 
 			const folderHandles = [];
@@ -705,24 +523,21 @@
 				folderHandles[0] = [];
 				folderHandles[0][0] = await drumDirHandle.getDirectoryHandle(drumFolder, { create: false });
 			} catch (e) {
-				logger("Missing drum style folder or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing drum style folder: " + e.message);
 			}				
 
 			try {						
 				folderHandles[1] = [];					
 				for (const i in bassFolders) if (bassFolders[i] != "") folderHandles[1][i] = await bassDirHandle.getDirectoryHandle(bassFolders[i], { create: false });
 			} catch (e) {
-				logger("Missing bass style folders or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing bass style folder: " + e.message);
 			}				
 
 			try {						
 				folderHandles[2] = [];			
 				for (const i in chordFolders) if (chordFolders[i] != "") folderHandles[2][i] = await chordDirHandle.getDirectoryHandle(chordFolders[i], { create: false });						
 			} catch (e) {
-				logger("Missing chord style folders or access/premissions issues - " + e); 
-				return;
+				throw new Error("Missing chord style folder: " + e.message);
 			}			
 			
 			for (const i in folderHandles) {
@@ -816,6 +631,10 @@
         const tempoInput = document.getElementById('ctrl-tempo');
         const keyInput = document.getElementById('ctrl-key');
 
+        document.querySelectorAll('.intro-choice').forEach(button => button.addEventListener('click', () => {
+            introEnding = Number(button.dataset.intro);
+            document.querySelectorAll('.intro-choice').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+        }));
         tempoInput.addEventListener('input', (e) => {
             document.getElementById('lbl-tempo').innerText = `Tempo Shift Step: ${e.target.value}`;
             if (isPlaying && !endingScheduled) restartArrangerEngine();
@@ -833,7 +652,7 @@
 			} else {
 				if (audioCtx.state === "suspended") await audioCtx.resume();
 				if (!hasBuffers([
-					["drums", intros[2]],
+					["drums", intros[introEnding]],
 					["bass", "0_BIN_MAJ_" + getMelodicKey()],
 					["chords", "0_IN_MAJ_" + getMelodicKey()]
 				])) return;
@@ -909,11 +728,22 @@
 		window.playDrumFill = function(key) {
 			if (scheduleDrumTransition(currentDrumKey, key)) logger(`Playing drum ${key}.`);
 		};
+		window.playFillX = () => playDrumFill(fills[currentVariation % 4]);
+		window.playBreakX = () => playDrumFill(breaks[currentVariation % 4]);
+		window.setVariationLetter = letter => setVariation(letter + (altVariation ? 4 : 0));
+		window.toggleAltVariation = function() {
+			altVariation = !altVariation;
+			updateVariationButtons();
+			if (isPlaying && !endingScheduled) setVariation((currentVariation % 4) + (altVariation ? 4 : 0));
+		};
 
 		function updateVariationButtons() {
 			document.querySelectorAll('.btn-var').forEach((btn, index) => {
-				btn.classList.toggle('active', index === currentVariation);
+				btn.classList.toggle('active', index === currentVariation % 4);
 			});
+			const altButton = document.getElementById('btn-arr-x');
+			altButton.setAttribute('aria-pressed', String(altVariation));
+			altButton.textContent = altVariation ? 'ARR_X (_1)' : 'ARR_X';
 		}
 
 		function changeStyleChord(detectedType, detectedRoot, detectedBass) {
@@ -1008,13 +838,14 @@
 			barDuration = 4 * (60 / tempo) / rate;
 			barStartTime = startTime;
 			currentVariation = 0;
-			currentDrumKey = intros[2];
+			altVariation = false;
+			currentDrumKey = intros[introEnding];
 			endingScheduled = false;
 			currentChordType = currentChordRoot = currentBassRoot = null;
 			updateVariationButtons();
 
             // Drums get the base drum asset file but still follow the rhythm playback rate
-            activeSources.push(triggerLoopNode("drums", loopAudioBuffers.drums[intros[2]], rate, startTime, fadeTime));
+            activeSources.push(triggerLoopNode("drums", loopAudioBuffers.drums[intros[introEnding]], rate, startTime, fadeTime));
             
             // Bass and Chords pull the counter-shifted pitch key files
             activeSources.push(triggerLoopNode("bass", loopAudioBuffers.bass["0_BIN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime));
@@ -1025,9 +856,6 @@
 			if (endingScheduled) return;
 
 			const playButton = document.querySelector("#btn-play");	
-			playButton.style.background = "brown"; 	
-			playButton.innerHTML = "STOPPING....";
-			
             const targetKey = keyInput.value;
             const tempoStep = parseInt(tempoInput.value, 10);
             const rate = Math.pow(2, tempoStep / 12);
@@ -1038,12 +866,14 @@
             if (targetAssetIndex < 0) targetAssetIndex += 12;
             const calculatedMelodicKey = noteNames[targetAssetIndex];
 
-			const drumBuffer = loopAudioBuffers.drums[endings[2]];
+			const drumBuffer = loopAudioBuffers.drums[endings[introEnding]];
 			if (!hasBuffers([
-				["drums", endings[2]],
+				["drums", endings[introEnding]],
 				["bass", "0_BEN_MAJ_" + calculatedMelodicKey],
 				["chords", "0_EN_MAJ_" + calculatedMelodicKey]
 			])) return;
+            playButton.style.background = "brown";
+            playButton.innerHTML = "STOPPING....";
 			const startTime = nextBarTime(audioCtx.currentTime);
 			endingScheduled = true;
 			activeSources.forEach(src => src.stop(startTime));
@@ -1117,8 +947,11 @@
                 div.innerText = `${name}${Math.floor(midiNote/12)-1}`;
                 
                 // Mouse interactions emulator for testing without physical controllers
-                div.onmousedown = () => handleInputRouting(144, midiNote, 100);
-                div.onmouseup = () => handleInputRouting(128, midiNote, 0);
+                div.onpointerdown = event => {
+                    div.setPointerCapture(event.pointerId);
+                    handleInputRouting(144, midiNote, 100);
+                };
+                div.onpointerup = div.onpointercancel = () => handleInputRouting(128, midiNote, 0);
                 
                 kbd.appendChild(div);
             }
@@ -1133,27 +966,31 @@
             try {
                 midiAccess = await navigator.requestMIDIAccess();
                 const statusBadge = document.getElementById('midi-status');
-                const inputs = midiAccess.inputs.values();
-                let discovered = 0;
-
-                for (let input of inputs) {
+                const connectInputs = () => {
+                    let discovered = 0;
+                    for (let input of midiAccess.inputs.values()) {
+                        if (input.state !== 'connected') continue;
                     input.onmidimessage = (e) => {
                         const [status, note, velocity] = e.data;
                         handleInputRouting(status, note, velocity);
                     };
-                    logger(`Successfully locked onto input device: [${input.name}]`);
                     discovered++;
-                }
-
-                if (discovered > 0) {
-                    statusBadge.innerText = "Connected";
-                    statusBadge.style.background = "#00e676";
+                    }
+                    statusBadge.innerText = discovered ? `${discovered} MIDI input${discovered === 1 ? '' : 's'} connected` : "Virtual keyboard";
+                    statusBadge.style.background = discovered ? "#00e676" : "#ffb300";
                     statusBadge.style.color = "#000";
-                } else {
-                    statusBadge.innerText = "Virtual Mode Only";
-                    statusBadge.style.background = "#ffb300";
-                    logger("No hardware detected via USB. Click visual keys to test engine.");
-                }
+                };
+                midiAccess.onstatechange = event => {
+                    if (event.port.type === 'input' && event.port.state === 'disconnected') {
+                        for (const note of activeNotes.keys()) {
+                            voices.noteOff(note);
+                            updateKeyVisual(note, 'off');
+                        }
+                        activeNotes.clear();
+                    }
+                    connectInputs();
+                };
+                connectInputs();
             } catch (err) {
                 logger(`Driver load failure: ${err.message}`);
             }
@@ -1165,7 +1002,7 @@
             const isNoteOff = (msgType === 128 || (msgType === 144 && velocity === 0));
 
             if (isNoteOn) {
-                if (synth && audioCtx.state === 'suspended') {
+                if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume().catch(error => logger(`Audio resume failed: ${error.message}`));
                 }
                 activeNotes.set(note, performance.now());
@@ -1173,7 +1010,7 @@
                 
                 // Immediately trigger visualization update
                 updateKeyVisual(note, 'melody');
-				if (synth) synth.noteOn(0, note, velocity);
+				voices.noteOn(note, velocity);
 
                 // Queue microsecond time window evaluation to look for full harmonic shapes
                 triggerChordEvaluationBuffer();
@@ -1182,7 +1019,7 @@
                 activeNotes.delete(note);
                 updateKeyVisual(note, 'off');
                 triggerChordEvaluationBuffer();
-				if (synth) synth.noteOff(0, note);
+				voices.noteOff(note);
             }
         }
 
@@ -1233,6 +1070,7 @@
 				}
 			}
 
+            if (bestMatchWeight < 0) return;
 			// Extract pitch classes (0-11) for the root and the actual lowest note held
 			const rootPitchClass = detectedRoot % 12;
 			const bassPitchClass = notesArray[0] % 12;
@@ -1272,6 +1110,99 @@
             if (state === 'chord') el.classList.add('active-chord');
         }
 
+
+        // Registrations: 20 JSON snapshots stored in <root>/REGISTRATIONS, with localStorage as fallback.
+        const regSelect = document.getElementById('reg-select');
+        const regName = n => `REG_${String(n).padStart(2, '0')}.json`;
+        async function regFolder(create) {
+            return rootDirHandle ? rootDirHandle.getDirectoryHandle('REGISTRATIONS', { create }) : null;
+        }
+        async function readRegistration(n) {
+            try {
+                const folder = await regFolder(false);
+                if (folder) return await (await (await folder.getFileHandle(regName(n))).getFile()).text();
+            } catch (error) { if (error.name !== 'NotFoundError') logger(`Registration read error: ${error.message}`); }
+            return localStorage.getItem(`evm-reg-${n}`);
+        }
+        async function refreshRegistrations() {
+            for (let n = 1; n <= 20; n++) {
+                const saved = await readRegistration(n);
+                regSelect.options[n - 1].textContent = `Reg ${n}${saved ? ' ●' : ''}`;
+            }
+        }
+        function captureRegistration() {
+            return {
+                version: 1,
+                style: selectedStyleInfo ? { path: selectedStyleInfo.path, name: selectedStyleInfo.name } : null,
+                performance: {
+                    key: keyInput.value, tempoShift: Number(tempoInput.value), autoFill: document.getElementById('auto-fill').checked,
+                    introEnding, variation: currentVariation % 4, alt: altVariation
+                },
+                mixer: JSON.parse(JSON.stringify(mixerState)),
+                voices: voices.getState()
+            };
+        }
+        async function saveRegistration(n) {
+            const text = JSON.stringify(captureRegistration(), null, 2);
+            let where = 'browser storage';
+            try {
+                const folder = await regFolder(true);
+                if (folder) {
+                    const writable = await (await folder.getFileHandle(regName(n), { create: true })).createWritable();
+                    await writable.write(text);
+                    await writable.close();
+                    where = `REGISTRATIONS/${regName(n)}`;
+                } else localStorage.setItem(`evm-reg-${n}`, text);
+            } catch (error) {
+                logger(`Could not write registration file (${error.message}); saved in browser storage instead.`);
+                localStorage.setItem(`evm-reg-${n}`, text);
+            }
+            logger(`Registration ${n} saved to ${where}.`);
+            refreshRegistrations();
+        }
+        async function recallRegistration(n) {
+            const text = await readRegistration(n);
+            if (!text) return logger(`Registration ${n} is empty.`);
+            let reg;
+            try { reg = JSON.parse(text); if (reg.version !== 1 || !Array.isArray(reg.voices?.voices) || !reg.mixer || !reg.performance) throw new Error('unrecognised format'); }
+            catch (error) { return logger(`Registration ${n} is invalid: ${error.message}`); }
+            const missing = [];
+            for (const name of Object.keys(mixerState)) {
+                const saved = reg.mixer[name];
+                if (!saved) continue;
+                mixerState[name].volume = Math.min(1, Math.max(0, Number(saved.volume) || 0));
+                mixerState[name].muted = Boolean(saved.muted);
+                mixerUpdaters[name]();
+            }
+            const perf = reg.performance;
+            const previousTuning = keyInput.value + tempoInput.value;
+            if (noteNames.includes(perf.key)) keyInput.value = perf.key;
+            tempoInput.value = Math.min(6, Math.max(-6, Number(perf.tempoShift) || 0));
+            document.getElementById('lbl-tempo').innerText = `Tempo Shift Step: ${tempoInput.value}`;
+            document.getElementById('auto-fill').checked = Boolean(perf.autoFill);
+            const intro = Number(perf.introEnding);
+            if (intro >= 0 && intro < 3) document.querySelector(`.intro-choice[data-intro="${intro}"]`).click();
+            const alt = Boolean(perf.alt);
+            missing.push(...voices.setState(reg.voices));
+            if (reg.style) {
+                const entry = styleGroups.get(reg.style.path)?.find(candidate => candidate.name === reg.style.name);
+                if (!entry) missing.push(`Style: ${reg.style.path}/${reg.style.name}`);
+                else if (selectedStyleInfo?.handle !== entry) await selectStyle(entry, reg.style.path);
+            }
+            if (isPlaying && !endingScheduled) {
+                if (keyInput.value + tempoInput.value !== previousTuning) restartArrangerEngine();
+                altVariation = alt;
+                setVariation((Number(perf.variation) || 0) % 4 + (alt ? 4 : 0));
+            } else {
+                altVariation = alt;
+                updateVariationButtons();
+            }
+            logger(`Registration ${n} recalled.${missing.length ? ` Not found in scanned folder: ${missing.join('; ')}` : ''}`);
+        }
+        document.getElementById('btn-reg-save').addEventListener('click', () => saveRegistration(Number(regSelect.value)));
+        document.getElementById('btn-reg-recall').addEventListener('click', () => recallRegistration(Number(regSelect.value)));
+        refreshRegistrations();
+
         window.setVariation = function(varNo) {
 			const targetKey = variations[varNo];
 			const fillKey = document.getElementById('auto-fill').checked ? fills[varNo % fills.length] : null;
@@ -1280,6 +1211,7 @@
 			currentDrumKey = targetKey;
 			updateVariationButtons();
 			variationRequested = true;
+            if (currentChordType !== null) changeStyleChord(currentChordType, currentChordRoot, currentBassRoot);
             logger(`Queued drum variation ${targetKey}${fillKey ? ` with ${fillKey}` : ""}.`);
         };
 		
