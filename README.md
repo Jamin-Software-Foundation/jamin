@@ -1,4 +1,4 @@
-# Vibe Arranger
+# Jamin Arranger
 
 A browser-based audio-loop arranger with two SoundFont voices and live Web MIDI input.
 
