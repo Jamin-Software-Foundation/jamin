@@ -1,0 +1,33 @@
+{
+    "short_name": "vibe-arranger",
+    "name": "Vibe Arranger",
+    "version": "1.0",	
+    "categories": ["music"],	
+    "description": "Proof of Concept for a Web based Audio Styles Arranger",    
+    "icons": [
+        {
+            "src": "./icon-1024x1024.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+			"purpose": "any maskable"			
+        },
+        {
+            "src": "./icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+			"purpose": "any maskable"			
+        },
+        {
+            "src": "./icon-297x288.png",
+            "sizes": "297x288",
+            "type": "image/png",
+			"purpose": "any maskable"			
+        }		
+    ],
+    "start_url": "./",
+    "scope": "./",	
+    "background_color": "#FFFFFF",
+    "theme_color": "#FFFFFF",
+    "display": "standalone",
+    "orientation": "portrait"
+}
