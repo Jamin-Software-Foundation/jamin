@@ -14,7 +14,9 @@
             <section class="panel-head browse-head" data-browse="voice2" tabindex="0" role="button"><small>SoundFont / Voice 2</small><strong id="voice2-name">NO VOICE SELECTED</strong></section>
             <section class="panel-head"><small>Selected part</small><strong id="selected-voice-label">VOICE 1</strong></section>
             <section class="panel-body side-left"><div class="action-grid" id="global-actions"></div>
-                <div class="status" id="global-status"></div><p class="status" id="engine-status" role="status">Choose a root folder to begin.</p></section>
+                <div class="status" id="global-status"></div><p class="status" id="engine-status" role="status">Choose a root folder to begin.</p>
+				<div id="beat-counter-container"></div>				
+			</section>
             <section class="panel-body browser-area" id="browser-area"><div class="browser-title" id="browser-title"></div>
                 <div class="style-list" id="style-browser"></div><div class="patch-list" id="voice1-browser" hidden></div><div class="patch-list" id="voice2-browser" hidden></div><div id="style-inspect"></div></section>
             <section class="panel-body side-right voice-settings"><div class="voice-tools"><button id="select-voice1" class="selected">Voice 1</button><button id="select-voice2">Voice 2</button></div>
@@ -125,3 +127,87 @@
     old('sf2-input').setAttribute('aria-label', 'Upload SoundFont for selected voice');
     old('sf2-play-btn').textContent = 'Test selected voice';
 })();
+
+class BeatCounterWidget {
+  constructor(container, audioCtx, options = {}) {
+    this.container = typeof container === 'string' 
+      ? document.querySelector(container) 
+      : container;
+    this.audioCtx = audioCtx;
+    this.bpm = options.bpm || 120;
+    this.beatsPerBar = options.beatsPerBar || 4;
+    this.startTime = null;
+    this.isPlaying = false;
+    this.rafId = null;
+
+    this.render();
+  }
+
+  render() {
+    this.container.innerHTML = `
+      <div style="font-family: monospace; background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 8px; display: inline-block; min-width: 220px;">
+        <div style="font-size: 12px; color: #a6adc8; margin-bottom: 4px;">BAR : BEAT</div>
+        <div id="bc-display" style="font-size: 32px; font-weight: bold; letter-spacing: 2px;">1 : 1</div>
+        <div id="bc-dots" style="display: flex; gap: 8px; margin-top: 12px;"></div>
+      </div>
+    `;
+
+    this.displayEl = this.container.querySelector('#bc-display');
+    this.dotsContainer = this.container.querySelector('#bc-dots');
+    this.dotEls = [];
+
+    for (let i = 0; i < this.beatsPerBar; i++) {
+      const dot = document.createElement('div');
+      dot.style.cssText = 'width: 16px; height: 16px; border-radius: 50%; background: #313244; transition: background 0.05s;';
+      this.dotsContainer.appendChild(dot);
+      this.dotEls.push(dot);
+    }
+  }
+
+  // Call this at the exact moment you call sourceNode.start(startTime)
+  start(startTime = this.audioCtx.currentTime) {
+    this.startTime = startTime;
+    this.isPlaying = true;
+    this.update();
+  }
+
+  stop() {
+    this.isPlaying = false;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.resetUI();
+  }
+
+  setBpm(newBpm) {
+    this.bpm = newBpm;
+  }
+
+  resetUI() {
+    this.displayEl.textContent = '1 : 1';
+    this.dotEls.forEach(dot => dot.style.background = '#313244');
+  }
+
+  update = () => {
+    if (!this.isPlaying) return;
+
+    const elapsedSeconds = Math.max(0, this.audioCtx.currentTime - this.startTime);
+    const secondsPerBeat = 60 / this.bpm;
+    const totalBeats = Math.floor(elapsedSeconds / secondsPerBeat);
+
+    const currentBar = Math.floor(totalBeats / this.beatsPerBar) + 1;
+    const currentBeat = (totalBeats % this.beatsPerBar) + 1;
+
+    this.displayEl.textContent = `${currentBar} : ${currentBeat}`;
+
+    this.dotEls.forEach((dot, index) => {
+      if (index + 1 === currentBeat) {
+        // Highlight downbeat (beat 1) in a distinct colour
+        dot.style.background = currentBeat === 1 ? '#f38ba8' : '#a6e3a1';
+      } else {
+        dot.style.background = '#313244';
+      }
+    });
+
+    this.rafId = requestAnimationFrame(this.update);
+  };
+}
+

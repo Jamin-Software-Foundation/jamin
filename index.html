@@ -191,6 +191,7 @@
         import { createVoices } from "./voices.js";
 
         let audioCtx = null;
+		let beatCounter = null;
         let mixer = null;
         const mixerState = Object.fromEntries(['drums', 'bass', 'chords', 'voice1', 'voice2', 'master'].map(name => [name, { volume: 1, muted: false }]));
         function getAudio() {
@@ -240,6 +241,7 @@
 		let barDuration = null;
 		let barStartTime = null;
 		let currentVariation = 0;
+		let oldVariation = 0;
 		let altVariation = false;
         let introEnding = 2;
 		let currentDrumKey = null;
@@ -498,6 +500,8 @@
 				logger("Tempo mismatch!!! Using drums tempo " + drumTempo);   
 				tempo = drumTempo;			
 			}
+
+			beatCounter = new BeatCounterWidget('#beat-counter-container', audioCtx, { bpm: tempo, beatsPerBar: 4});						
 			
 			const instrument = ["drums", "bass", "chords"];
 			let drumDirHandle, bassDirHandle, chordDirHandle;
@@ -673,10 +677,15 @@
 		
 		document.getElementById('btn-solo').addEventListener('click', async (e) => {
 			soloActive = !soloActive;
-			e.target.classList.toggle('active', soloActive);
-			e.target.innerText = "SOLO " + (soloActive ? "ON" : "OFF");
+			setSoloActive();
 		});
 
+		function setSoloActive() {
+			const target = document.getElementById('btn-solo');
+			target.classList.toggle('active', soloActive);
+			target.innerText = "SOLO " + (soloActive ? "ON" : "OFF");		
+		}
+		
 		function getMelodicKey() {
 			const index = (noteNames.indexOf(keyInput.value) - parseInt(tempoInput.value, 10) + 12) % 12;
 			return noteNames[index];
@@ -823,8 +832,7 @@
 				
 				if (calculatedMelodicKey && hasBuffers([[oldNode.loopType, calculatedMelodicKey]])) {
 					const buffer = loopAudioBuffers[oldNode.loopType][calculatedMelodicKey];					
-					let offset = ((now - barStartTime) * rate % buffer.duration + buffer.duration) % buffer.duration;	
-					//if (soloActive) offset = offset % barDuration;
+					const offset = ((now - barStartTime) * rate % buffer.duration + buffer.duration) % buffer.duration;	
 					
 					oldNode.gainNode.gain.setValueAtTime(oldNode.gainNode.gain.value, now);
 					oldNode.gainNode.gain.linearRampToValueAtTime(0, now + fadeTime);
@@ -866,6 +874,8 @@
 
             // Drums get the base drum asset file but still follow the rhythm playback rate
             activeSources.push(triggerLoopNode("drums", loopAudioBuffers.drums[intros[introEnding]], rate, startTime, fadeTime));
+			beatCounter.bpm = Math.ceil(tempo * rate); 
+			beatCounter.start(startTime);
             
             // Bass and Chords pull the counter-shifted pitch key files
             activeSources.push(triggerLoopNode("bass", loopAudioBuffers.bass["0_BIN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime));
@@ -908,8 +918,9 @@
 			bassNode.stop(endTime);
 			chordNode.stop(endTime);
 			activeSources.push(bassNode, chordNode);
+			
 			drumNode.onended = () => {
-				if (endingNode === drumNode) stopArranger();
+				if (endingNode === drumNode) stopArranger();			
 			};
 		}
 
@@ -943,6 +954,7 @@
 			playButton.innerHTML = "START";
 			playButton.style.background = "#ff3d00"; 			
             logger("Engine tracking stopped.");
+			beatCounter.stop();				
         }
 
         function restartArrangerEngine() {
@@ -1156,7 +1168,7 @@
                 style: selectedStyleInfo ? { path: selectedStyleInfo.path, name: selectedStyleInfo.name } : null,
                 performance: {
                     key: keyInput.value, tempoShift: Number(tempoInput.value), autoFill: document.getElementById('auto-fill').checked,
-                    introEnding, variation: currentVariation % 4, alt: altVariation
+                    introEnding, variation: currentVariation % 4, alt: altVariation, solo: soloActive
                 },
                 mixer: JSON.parse(JSON.stringify(mixerState)),
                 voices: voices.getState()
@@ -1217,6 +1229,9 @@
                 altVariation = alt;
                 updateVariationButtons();
             }
+			soloActive = perf.solo;
+			setSoloActive();
+			
             logger(`Registration ${n} recalled.${missing.length ? ` Not found in scanned folder: ${missing.join('; ')}` : ''}`);
         }
         document.getElementById('btn-reg-save').addEventListener('click', () => saveRegistration(Number(regSelect.value)));
@@ -1227,6 +1242,7 @@
 			const targetKey = variations[varNo];
 			const fillKey = document.getElementById('auto-fill').checked ? fills[varNo % fills.length] : null;
 			if (!scheduleDrumTransition(targetKey, fillKey)) return;
+			oldVariation = currentVariation;			
 			currentVariation = varNo;
 			currentDrumKey = targetKey;
 			updateVariationButtons();
