@@ -35,7 +35,9 @@
         .data-card { background: #121214; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ff3d00; font-family: monospace; font-size: 14px; }
         .variation-rack {display: grid;  grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 5px; }		
         .btn-var {font-size: 11px;  padding: 8px;  border-color: #333; }
-        .btn-var.active {background: linear-gradient(180deg, #00b0ff 0%, #0070a3 100%); border-color: #00e5ff;  color: #fff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);}    
+        .btn-var.active {background: linear-gradient(180deg, #00b0ff 0%, #0070a3 100%); border-color: #00e5ff;  color: #fff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);}  
+        .btn-solo {font-size: 11px;  padding: 8px;  border-color: #333; }
+        .btn-solo.active {background: linear-gradient(180deg, #00b0ff 0%, #0070a3 100%); border-color: #00e5ff;  color: #fff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);} 		
         .control-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
         .control-row label { min-width: 90px; }
         button[aria-pressed="true"] { background: #ff7043; }
@@ -57,12 +59,13 @@
             <strong>Select a `.KST` File to Analyze:</strong>
             <div id="kst-items"></div>
         </div>
+        <button class="btn-solo" id="btn-solo">SOLO OFF</button>		
     </div>
 
     <!-- TARGET EXTRACTOR CONTROL -->
     <div class="box">
         <h3>2. KSHP Header Memory Assignment</h3>
-        <button id="btn-parse" disabled>Inspect & Extract KSHP Block Boundaries</button>
+        <button id="btn-parse" style="display:none" disabled>Inspect & Extract KSHP Block Boundaries</button>
         
         <div class="data-card">
             <div>⏱️ Native Track Tempo: <span id="out-tempo" class="highlight">-- BPM</span></div><br>
@@ -142,7 +145,7 @@
 				<button class="btn-var" onclick="setVariationLetter(1)">ARR B</button>
 				<button class="btn-var" onclick="setVariationLetter(2)">ARR C</button>
 				<button class="btn-var" onclick="setVariationLetter(3)">ARR D</button>
-				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">VARIATION</button>
+				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">VAR 1-4</button>
 				<button id="btn-fil-x" onclick="playFillX()">FILL</button>
 				<button id="btn-brk-x" onclick="playBreakX()">BREAK</button>
 			</div>
@@ -223,7 +226,8 @@
         document.getElementById('btn-scan-sf2').addEventListener('click', () => {
             if (rootDirHandle) voices.scan(rootDirHandle);
         });
-
+		
+		let soloActive = false;
 		let variationRequested = false;
         let rootDirHandle = null;
         let selectedStyleInfo = null;
@@ -666,6 +670,12 @@
         });
 
         document.getElementById('btn-stop').addEventListener('click', stopArranger);
+		
+		document.getElementById('btn-solo').addEventListener('click', async (e) => {
+			soloActive = !soloActive;
+			e.target.classList.toggle('active', soloActive);
+			e.target.innerText = "SOLO " + (soloActive ? "ON" : "OFF");
+		});
 
 		function getMelodicKey() {
 			const index = (noteNames.indexOf(keyInput.value) - parseInt(tempoInput.value, 10) + 12) % 12;
@@ -745,7 +755,7 @@
 			});
 			const altButton = document.getElementById('btn-arr-x');
 			altButton.setAttribute('aria-pressed', String(altVariation));
-			altButton.textContent = altVariation ? 'ARR_X (_1)' : 'ARR_X';
+			altButton.textContent = altVariation ? 'VAR 1-8' : 'VAR 1-4';
 		}
 
 		function changeStyleChord(detectedType, detectedRoot, detectedBass) {
@@ -757,13 +767,19 @@
 			if (currentChordType == detectedType && currentChordRoot == detectedRoot && currentBassRoot == detectedBass && !variationRequested) {
 				return;
 			}
-
+			
 			variationRequested = false;		// need to play same chord again if variation has changed
+
+			if (soloActive) {				// fix to root	
+				detectedType = "Maj";
+				detectedRoot = 0;
+				detectedBass = 0;
+			} 
 			
 			currentChordType = detectedType;
 			currentChordRoot = detectedRoot;
 			currentBassRoot = detectedBass;
-
+			
 			const fadeTime = 0.1;
 			const now = audioCtx.currentTime;	
 			const newSources = [];
@@ -806,8 +822,10 @@
 				}
 				
 				if (calculatedMelodicKey && hasBuffers([[oldNode.loopType, calculatedMelodicKey]])) {
-					const buffer = loopAudioBuffers[oldNode.loopType][calculatedMelodicKey];
-					const offset = ((now - barStartTime) * rate % buffer.duration + buffer.duration) % buffer.duration;
+					const buffer = loopAudioBuffers[oldNode.loopType][calculatedMelodicKey];					
+					let offset = ((now - barStartTime) * rate % buffer.duration + buffer.duration) % buffer.duration;	
+					//if (soloActive) offset = offset % barDuration;
+					
 					oldNode.gainNode.gain.setValueAtTime(oldNode.gainNode.gain.value, now);
 					oldNode.gainNode.gain.linearRampToValueAtTime(0, now + fadeTime);
 					oldNode.stop(now + fadeTime + 0.1);

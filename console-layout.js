@@ -22,16 +22,18 @@
             <section class="mixer" id="console-mixer"><span class="mixer-title">MIXER</span></section>
         </div>
         <nav class="toolbar" aria-label="Style performance controls" id="performance"></nav>
-        <details><summary>Keyboard and diagnostics</summary><div id="diagnostics"></div></details>`;
+        <details style="display:none"><summary>Keyboard and diagnostics</summary><div id="diagnostics"></div></details>`;
     document.body.insertBefore(consoleElement, document.querySelector('script[type="module"]'));
     const move = (id, parent) => old(parent).appendChild(old(id));
     move('btn-link-dir', 'global-actions');
     move('btn-midi-init', 'global-actions');
     move('btn-scan-sf2', 'global-actions');
+    move('btn-solo', 'global-actions');	
     move('txt-dir', 'global-status');
     move('midi-status', 'global-status');
     move('sf2-scan-status', 'global-status');
     move('status', 'global-status');
+
     old('style-browser').appendChild(old('kst-items'));
     old('file-display').remove();
     move('btn-parse', 'style-inspect');
@@ -64,12 +66,12 @@
         };
         if (!open) {
             for (const group of groups) {
-                add(`${group.name}  (${group.items.length})`, group.items.some(item => item.selected) ? 'group selected' : 'group',
+                add(`${group.name.replace('USER_STYLE/', '')}  (${group.items.length})`, group.items.some(item => item.selected) ? 'group selected' : 'group',
                     () => { state.open = group.name; window.renderTwoLevel(container, state, groups, emptyText); });
             }
             return;
         }
-        add('◄ ' + open.name, 'back', () => { state.open = null; window.renderTwoLevel(container, state, groups, emptyText); });
+        add('◄ ' + open.name.replace('USER_STYLE/', ''), 'back', () => { state.open = null; window.renderTwoLevel(container, state, groups, emptyText); });
         for (const item of open.items) add(item.label, item.selected ? 'selected' : '', item.onClick, item.title);
     };
     const browserViews = { style: 'style-browser', voice1: 'voice1-browser', voice2: 'voice2-browser' };
@@ -104,7 +106,7 @@
     const toolbar = old('performance');
     for (let i = 1; i <= 3; i++) {
         const button = document.createElement('button');
-        button.textContent = `In / End ${i}`;
+        button.textContent = `Intro / End ${i}`;
         button.className = 'intro-choice';
         button.dataset.intro = String(i - 1);
         button.setAttribute('aria-pressed', String(i === 3));

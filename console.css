@@ -4,7 +4,7 @@ body > h1, body > p, body > .box, body > h3, body > .log { display: none; }
 button, select, input { font: inherit; }
 button { cursor: pointer; }
 button:disabled, select:disabled { opacity: .48; cursor: not-allowed; }
-.console { min-width: 760px; max-width: 1500px; margin: auto; }
+.console { min-width: 760px; max-width: 1400px; margin: auto; }
 .topline { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px 8px; color: #2c4445; font-size: 11px; font-weight: bold; letter-spacing: .12em; }
 .console-grid { display: grid; grid-template-columns: 19% 21% 20% 20% 20%; gap: 5px; }
 .panel { min-width: 0; }
@@ -65,7 +65,7 @@ button:disabled, select:disabled { opacity: .48; cursor: not-allowed; }
 .side-left, .side-right { grid-row: 2 / 4; margin-top: 0; align-self: start; }
 .side-left { grid-column: 1; }
 .side-right { grid-column: 5; }
-.browser-area { grid-column: 2 / 5; grid-row: 2; margin-top: 0; min-height: 300px; }
+.browser-area { grid-column: 2 / 5; grid-row: 2; margin-top: 0; min-height: 450px; }
 .browser-title { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #37504e; margin-bottom: 4px; }
 .browser-area .style-list, .browser-area .patch-list { height: 300px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px; align-content: start; }
 .browser-area [hidden] { display: none !important; }
