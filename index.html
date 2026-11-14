@@ -228,15 +228,16 @@
             if (rootDirHandle) voices.scan(rootDirHandle);
         });
 		
+		let recalling = false;
 		let soloActive = false;
 		let variationRequested = false;
         let rootDirHandle = null;
         let selectedStyleInfo = null;
         let styleLoading = false;
 		
-		let currentChordRoot = null;
-		let currentBassRoot = null;
-		let currentChordType = null;
+		let currentChordRoot = 0;
+		let currentBassRoot = 0;
+		let currentChordType = "Maj";
 			
 		let barDuration = null;
 		let barStartTime = null;
@@ -654,26 +655,13 @@
             if (isPlaying && !endingScheduled) restartArrangerEngine();
         });
 
-        document.getElementById('btn-play').addEventListener('click', async (e) => {
-            if (!audioCtx) return logger("Please click 'Link Folder' first.");
-			
-			if (isPlaying) {
-				stopArrangerPlaybackChannels();				
-			} else {
-				if (audioCtx.state === "suspended") await audioCtx.resume();
-				if (!hasBuffers([
-					["drums", intros[introEnding]],
-					["bass", "0_BIN_MAJ_" + getMelodicKey()],
-					["chords", "0_IN_MAJ_" + getMelodicKey()]
-				])) return;
-				isPlaying = true;
-				e.target.innerHTML = "END";
-				e.target.style.background = "#00e676"; 				
-				runArrangerPlaybackChannels();
-			}
+        document.getElementById('btn-play').addEventListener('click', (e) => {
+			toggleStartEndArranger();
         });
 
-        document.getElementById('btn-stop').addEventListener('click', stopArranger);
+        document.getElementById('btn-stop').addEventListener('click', (e) => {
+			stopArranger();
+		});
 		
 		document.getElementById('btn-solo').addEventListener('click', async (e) => {
 			soloActive = !soloActive;
@@ -768,14 +756,18 @@
 		}
 
 		function changeStyleChord(detectedType, detectedRoot, detectedBass) {
-			
-			if (!isPlaying || endingScheduled) {
-			  return;
-			}
-				
+							
 			if (currentChordType == detectedType && currentChordRoot == detectedRoot && currentBassRoot == detectedBass && !variationRequested) {
 				return;
 			}
+
+			currentChordType = detectedType;
+			currentChordRoot = detectedRoot;
+			currentBassRoot = detectedBass;
+			
+			if (!isPlaying || endingScheduled) {
+			  return;
+			}			
 			
 			variationRequested = false;		// need to play same chord again if variation has changed
 
@@ -784,10 +776,6 @@
 				detectedRoot = 0;
 				detectedBass = 0;
 			} 
-			
-			currentChordType = detectedType;
-			currentChordRoot = detectedRoot;
-			currentBassRoot = detectedBass;
 			
 			const fadeTime = 0.1;
 			const now = audioCtx.currentTime;	
@@ -869,7 +857,7 @@
 			altVariation = false;
 			currentDrumKey = intros[introEnding];
 			endingScheduled = false;
-			currentChordType = currentChordRoot = currentBassRoot = null;
+			//currentChordType = currentChordRoot = currentBassRoot = null;
 			updateVariationButtons();
 
             // Drums get the base drum asset file but still follow the rhythm playback rate
@@ -881,6 +869,32 @@
             activeSources.push(triggerLoopNode("bass", loopAudioBuffers.bass["0_BIN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime));
             activeSources.push(triggerLoopNode("chords", loopAudioBuffers.chords["0_IN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime));
         }
+
+       function toggleStartEndArranger() {
+            if (!audioCtx) return logger("Please click 'Link Folder' first.");
+			
+			if (isPlaying) {
+				stopArrangerPlaybackChannels();				
+			} else {
+				startArrangerPlaybackChannels();
+			}
+        };
+		
+        async function startArrangerPlaybackChannels() {
+			const playButton = document.querySelector("#btn-play");	
+			
+			if (audioCtx.state === "suspended") await audioCtx.resume();
+			
+			if (!hasBuffers([
+				["drums", intros[introEnding]],
+				["bass", "0_BIN_" + currentChordType.toUpperCase() + "_" + getMelodicKey()],
+				["chords", "0_IN_" + currentChordType.toUpperCase() + "_" + getMelodicKey()]
+			])) return;
+			isPlaying = true;
+			playButton.innerHTML = "END";
+			playButton.style.background = "#00e676"; 				
+			runArrangerPlaybackChannels();			
+		}
 		
         function stopArrangerPlaybackChannels() {
 			if (endingScheduled) return;
@@ -899,8 +913,8 @@
 			const drumBuffer = loopAudioBuffers.drums[endings[introEnding]];
 			if (!hasBuffers([
 				["drums", endings[introEnding]],
-				["bass", "0_BEN_MAJ_" + calculatedMelodicKey],
-				["chords", "0_EN_MAJ_" + calculatedMelodicKey]
+				["bass", "0_BEN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey],
+				["chords", "0_EN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey]
 			])) return;
             playButton.style.background = "brown";
             playButton.innerHTML = "ENDING..";
@@ -1036,8 +1050,15 @@
 
         function handleInputRouting(status, note, velocity) {
             const msgType = status & 0xF0;
+			const channel = status & 0x0F;
+			//console.debug("handleInputRouting", msgType, channel, note, velocity);
+						
             const isNoteOn = (msgType === 144 && velocity > 0);
             const isNoteOff = (msgType === 128 || (msgType === 144 && velocity === 0));
+			
+			const isStart = msgType == 240 || (msgType == 176 && note == 23 && velocity == 127);
+			const programChange = msgType == 192;
+			const controlChange = msgType == 176;				
 
             if (isNoteOn) {
                 if (audioCtx && audioCtx.state === 'suspended') {
@@ -1053,12 +1074,52 @@
                 // Queue microsecond time window evaluation to look for full harmonic shapes
                 triggerChordEvaluationBuffer();
             } 
-            else if (isNoteOff) {
+            else
+
+			if (isNoteOff) {
                 activeNotes.delete(note);
                 updateKeyVisual(note, 'off');
                 triggerChordEvaluationBuffer();
 				voices.noteOff(note);
             }
+			else
+			
+			if (isStart) {
+				toggleStartEndArranger();
+			}
+			else 
+			
+			if (programChange) {	// drum pads - trigger variations
+				
+				if (!isPlaying) 
+				{
+					if (!recalling) {
+						recallRegistration(note + 1);
+						document.getElementById('reg-select').selectedIndex = note;
+					}
+				} else {
+					if (note >= 0 && note < 8) setVariation(note);
+					if (note > 7 && note < 12) playDrumFill(fills[note % 4]);
+					if (note > 11 && note < 16) playDrumFill(breaks[note % 4]);			
+				}
+			}
+			else
+			
+			if (controlChange) {	// encoders - change volumes
+				let name;
+				if (note == 21 || note == 12) {name = "drums"; 	document.querySelector("#volume-" + name).value = (velocity / 127) * 100};
+				if (note == 22 || note == 13) {name = "bass"; 	document.querySelector("#volume-" + name).value = (velocity / 127) * 100};
+				if (note == 23 || note == 14) {name = "chords"; document.querySelector("#volume-" + name).value = (velocity / 127) * 100};	
+				if (note == 24 || note == 16) {name = "voice1"; document.querySelector("#volume-" + name).value = (velocity / 127) * 100};
+				if (note == 25 || note == 17) {name = "voice2"; document.querySelector("#volume-" + name).value = (velocity / 127) * 100};
+				if (note == 26 || note == 15) {name = "master"; document.querySelector("#volume-" + name).value = (velocity / 127) * 100};	
+
+				if (mixer && name) {
+					mixer[name].gain.setValueAtTime((velocity / 127), audioCtx.currentTime);	
+					document.getElementById(`level-${name}`).textContent = `${Math.round((velocity / 127) * 100)}%`;		
+				}					
+			}
+			
         }
 
         function triggerChordEvaluationBuffer() {
@@ -1199,6 +1260,10 @@
             refreshRegistrations();
         }
         async function recallRegistration(n) {
+			if (recalling) return;
+			recalling = true;			
+			//console.debug("recallRegistration", n);
+			
             const text = await readRegistration(n);
             if (!text) return logger(`Registration ${n} is empty.`);
             let reg;
@@ -1237,11 +1302,12 @@
             }
 			soloActive = perf.solo;
 			setSoloActive();
+			recalling = false;
 			
             logger(`Registration ${n} recalled.${missing.length ? ` Not found in scanned folder: ${missing.join('; ')}` : ''}`);
         }
         document.getElementById('btn-reg-save').addEventListener('click', () => saveRegistration(Number(regSelect.value)));
-        document.getElementById('btn-reg-recall').addEventListener('click', () => recallRegistration(Number(regSelect.value)));
+        document.getElementById('btn-reg-recall').addEventListener('click', () => {if (!recalling) recallRegistration(Number(regSelect.value))});
         refreshRegistrations();
 
         window.setVariation = function(varNo) {
@@ -1256,7 +1322,7 @@
             if (currentChordType !== null) changeStyleChord(currentChordType, currentChordRoot, currentBassRoot);
             logger(`Queued drum variation ${targetKey}${fillKey ? ` with ${fillKey}` : ""}.`);
         };
-		
+				
 		buildExtendedKeyboard();
 	</script>
 </body>
