@@ -667,7 +667,7 @@
 					["chords", "0_IN_MAJ_" + getMelodicKey()]
 				])) return;
 				isPlaying = true;
-				e.target.innerHTML = "STOP";
+				e.target.innerHTML = "END";
 				e.target.style.background = "#00e676"; 				
 				runArrangerPlaybackChannels();
 			}
@@ -903,7 +903,7 @@
 				["chords", "0_EN_MAJ_" + calculatedMelodicKey]
 			])) return;
             playButton.style.background = "brown";
-            playButton.innerHTML = "STOPPING....";
+            playButton.innerHTML = "ENDING..";
 			const startTime = nextBarTime(audioCtx.currentTime);
 			endingScheduled = true;
 			activeSources.forEach(src => src.stop(startTime));
@@ -913,14 +913,12 @@
             
             // Bass and Chords pull the counter-shifted pitch key files
 			const endTime = startTime + drumBuffer.duration / rate;
-            const bassNode = triggerLoopNode("bass", loopAudioBuffers.bass["0_BEN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime);
-            const chordNode = triggerLoopNode("chords", loopAudioBuffers.chords["0_EN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime);
-			bassNode.stop(endTime);
-			chordNode.stop(endTime);
+            const bassNode = triggerLoopNode("bass", loopAudioBuffers.bass["0_BEN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
+            const chordNode = triggerLoopNode("chords", loopAudioBuffers.chords["0_EN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
 			activeSources.push(bassNode, chordNode);
 			
 			drumNode.onended = () => {
-				if (endingNode === drumNode) stopArranger();			
+				setTimeout(stopArranger);
 			};
 		}
 
@@ -942,9 +940,17 @@
 			};
             return src;
         }
+		
+		function stopWithFadeOut(src, fadeDuration = 2.0) {	
+			const now = audioCtx.currentTime;		
+			const gain = src.gainNode.gain;
+			gain.setTargetAtTime(0.01, now, 0.5);	
+			src.loop = false;			
+			src.stop(now + fadeDuration);
+		}	
 
         function stopArranger() {
-            activeSources.forEach(src => { try { src.stop(); } catch(e){} });
+            activeSources.forEach(src => { stopWithFadeOut(src)});
             activeSources = [];
 
 			endingScheduled = false;
