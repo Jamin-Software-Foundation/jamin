@@ -108,7 +108,7 @@
     const toolbar = old('performance');
     for (let i = 1; i <= 3; i++) {
         const button = document.createElement('button');
-        button.textContent = `Intro / End ${i}`;
+        button.textContent = `Int/End ${i}`;
         button.className = 'intro-choice';
         button.dataset.intro = String(i - 1);
         button.setAttribute('aria-pressed', String(i === 3));
@@ -116,7 +116,7 @@
     }
     variationRacks.forEach(rack => toolbar.append(...rack.children));
     toolbar.append(old('auto-fill').parentElement, old('ctrl-key'), old('lbl-tempo'), old('ctrl-tempo'), old('btn-play'), old('btn-stop'));
-    old('btn-play').textContent = 'Start / End';
+    old('btn-play').textContent = 'Start/End';
     old('btn-play').disabled = true;
     old('btn-stop').textContent = 'Stop';
     old('ctrl-key').setAttribute('aria-label', 'Arranger key');

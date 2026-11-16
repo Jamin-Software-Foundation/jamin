@@ -283,7 +283,7 @@
         document.getElementById('btn-link-dir').addEventListener('click', async () => {
             try {
                 if (!window.showDirectoryPicker) throw new Error('Folder access requires a supported Chromium browser in a secure context.');
-                const root = await window.showDirectoryPicker({ mode: 'readwrite' });
+                const root = await window.showDirectoryPicker({ mode: 'readwrite', id: 'vibe-arranger'  });
                 document.getElementById('btn-link-dir').disabled = true;
                 if (isPlaying) stopArranger();
                 rootDirHandle = root;
@@ -847,8 +847,8 @@
             if (targetAssetIndex < 0) targetAssetIndex += 12;
             const calculatedMelodicKey = noteNames[targetAssetIndex];
 
-            logger(`[DRUMS] Streaming default master loop at speed multiplier: x${rate.toFixed(4)}`);
-            logger(`[MELODIC] Root: ${targetKey} | Shift Offset: ${tempoStep} | Loading Asset Key: [${calculatedMelodicKey}]`);
+            //logger(`[DRUMS] Streaming default master loop at speed multiplier: x${rate.toFixed(4)}`);
+            //logger(`[MELODIC] Root: ${targetKey} | Shift Offset: ${tempoStep} | Loading Asset Key: [${calculatedMelodicKey}]`);
 
             const startTime = audioCtx.currentTime + 0.03;
 			barDuration = 4 * (60 / tempo) / rate;
@@ -1065,7 +1065,7 @@
                     audioCtx.resume().catch(error => logger(`Audio resume failed: ${error.message}`));
                 }
                 activeNotes.set(note, performance.now());
-                logger(`📥 [INPUT TRIGGER] Note: ${note} | Velocity: ${velocity} -> Forwarded instantly to Sampler Layer`);
+                //logger(`📥 [INPUT TRIGGER] Note: ${note} | Velocity: ${velocity} -> Forwarded instantly to Sampler Layer`);
                 
                 // Immediately trigger visualization update
                 updateKeyVisual(note, 'melody');
@@ -1194,7 +1194,7 @@
 			outputChord.innerText = chordDisplayName;
 			outputAsset.innerText = `${rootName}_${assetSuffix}`; // Ketron assets still track the master chord root
 			
-			logger(`🎰 [ARRANGER MATCH] Voicing Found -> ${chordDisplayName} (Targeting asset: ${rootName}_${assetSuffix})`);
+			//logger(`🎰 [ARRANGER MATCH] Voicing Found -> ${chordDisplayName} (Targeting asset: ${rootName}_${assetSuffix})`);
 
 			notesArray.forEach(note => updateKeyVisual(note, 'chord'));
 			changeStyleChord(detectedType, rootPitchClass, bassPitchClass); 
@@ -1300,7 +1300,7 @@
                 altVariation = alt;
                 updateVariationButtons();
             }
-			soloActive = perf.solo;
+			soloActive = !!perf.solo;
 			setSoloActive();
 			recalling = false;
 			
@@ -1320,7 +1320,7 @@
 			updateVariationButtons();
 			variationRequested = true;
             if (currentChordType !== null) changeStyleChord(currentChordType, currentChordRoot, currentBassRoot);
-            logger(`Queued drum variation ${targetKey}${fillKey ? ` with ${fillKey}` : ""}.`);
+            //logger(`Queued drum variation ${targetKey}${fillKey ? ` with ${fillKey}` : ""}.`);
         };
 				
 		buildExtendedKeyboard();
