@@ -323,49 +323,37 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 	beatCounter = new BeatCounterWidget('#beat-counter-container', audioCtx, { bpm: tempo, beatsPerBar: 4});						
 	
 	const instrument = ["drums", "bass", "chords"];
+	const folderHandles = [];		
+	
 	let drumDirHandle, bassDirHandle, chordDirHandle;
 	let userModelingHandle = await rootDirHandle.getDirectoryHandle('USER_MODELING', { create: false });	
 
+
 	try {
 		drumDirHandle = await userModelingHandle.getDirectoryHandle('LiveDrum', { create: false });	
+		folderHandles[0] = [];
+		folderHandles[0][0] = await drumDirHandle.getDirectoryHandle(drumFolder, { create: false });		
 	} catch (e) {
 		throw new Error("Missing LiveDrum folder: " + e.message);
 	}
 	
 	try {
 		bassDirHandle = await userModelingHandle.getDirectoryHandle('RealBass', { create: false });	
+		folderHandles[1] = [];					
+		for (const i in bassFolders) if (bassFolders[i] != "") folderHandles[1][i] = await bassDirHandle.getDirectoryHandle(bassFolders[i], { create: false });		
 	} catch (e) {
-		throw new Error("Missing RealBass folder: " + e.message);
+		//throw new Error("Missing RealBass folder: " + e.message);
+		console.warn("Missing RealBass Folder");		
 	}
 
 	try {
 		chordDirHandle = await userModelingHandle.getDirectoryHandle('RealChord', { create: false });
-	} catch (e) {
-		throw new Error("Missing RealChord folder: " + e.message);
-	}			
-
-	const folderHandles = [];
-	
-	try {						
-		folderHandles[0] = [];
-		folderHandles[0][0] = await drumDirHandle.getDirectoryHandle(drumFolder, { create: false });
-	} catch (e) {
-		throw new Error("Missing drum style folder: " + e.message);
-	}				
-
-	try {						
-		folderHandles[1] = [];					
-		for (const i in bassFolders) if (bassFolders[i] != "") folderHandles[1][i] = await bassDirHandle.getDirectoryHandle(bassFolders[i], { create: false });
-	} catch (e) {
-		throw new Error("Missing bass style folder: " + e.message);
-	}				
-
-	try {						
 		folderHandles[2] = [];			
-		for (const i in chordFolders) if (chordFolders[i] != "") folderHandles[2][i] = await chordDirHandle.getDirectoryHandle(chordFolders[i], { create: false });						
+		for (const i in chordFolders) if (chordFolders[i] != "") folderHandles[2][i] = await chordDirHandle.getDirectoryHandle(chordFolders[i], { create: false });								
 	} catch (e) {
-		throw new Error("Missing chord style folder: " + e.message);
-	}			
+		//throw new Error("Missing RealChord folder: " + e.message);
+		console.warn("Missing RealChord Folder");
+	}									
 	
 	for (const i in folderHandles) {
 		const handles = folderHandles[i];
@@ -979,7 +967,8 @@ async function startArrangerPlaybackChannels() {
 		["drums", intros[introEnding]],
 		["bass", "0_BIN_" + currentChordType.toUpperCase() + "_" + getMelodicKey()],
 		["chords", "0_IN_" + currentChordType.toUpperCase() + "_" + getMelodicKey()]
-	])) return;
+	])) console.warn("Missing some intro loops");
+
 	isPlaying = true;
 	playButton.innerHTML = "END";
 	playButton.style.background = "#00e676"; 				
@@ -1001,29 +990,36 @@ function stopArrangerPlaybackChannels() {
 	const calculatedMelodicKey = noteNames[targetAssetIndex];
 
 	const drumBuffer = loopAudioBuffers.drums[endings[introEnding]];
-	if (!hasBuffers([
-		["drums", endings[introEnding]],
-		["bass", "0_BEN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey],
-		["chords", "0_EN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey]
-	])) return;
+	
+	if (!hasBuffers([	["drums", endings[introEnding]]	])) {
+		setTimeout(stopArranger);
+		return;
+	}
+	
 	playButton.style.background = "brown";
 	playButton.innerHTML = "ENDING..";
 	const startTime = nextBarTime(audioCtx.currentTime);
 	endingScheduled = true;
 	activeSources.forEach(src => src.stop(startTime));
+	activeSources = [];
+
 	const drumNode = triggerLoopNode("drums", drumBuffer, rate, startTime, fadeTime, 0, false);
 	endingNode = drumNode;
 	activeSources.push(drumNode);
 	
-	// Bass and Chords pull the counter-shifted pitch key files
-	const endTime = startTime + drumBuffer.duration / rate;
-	const bassNode = triggerLoopNode("bass", loopAudioBuffers.bass["0_BEN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
-	const chordNode = triggerLoopNode("chords", loopAudioBuffers.chords["0_EN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
-	activeSources.push(bassNode, chordNode);
-	
 	drumNode.onended = () => {
 		setTimeout(stopArranger);
-	};
+	};		
+	
+	if (hasBuffers([  ["bass", "0_BEN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey] ])) {		
+		const bassNode = triggerLoopNode("bass", loopAudioBuffers.bass["0_BEN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
+		activeSources.push(bassNode);
+	}
+
+	if (hasBuffers([  ["chords", "0_EN_" + currentChordType.toUpperCase() + "_" + calculatedMelodicKey]])) {	
+		const chordNode = triggerLoopNode("chords", loopAudioBuffers.chords["0_EN_MAJ_" + calculatedMelodicKey], rate, startTime, fadeTime, 0, false);
+		activeSources.push(chordNode);
+	}
 }
 
 function triggerLoopNode(loopType, audioBuffer, rate, startTime, fadeTime, offset = 0, loop = true) {
