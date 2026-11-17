@@ -1,0 +1,26 @@
+body { background: #121214; color: #fff; font-family: sans-serif; padding: 20px; }
+.box { background: #1e1e24; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+button { background: #00e676; color: #000; font-weight: bold; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+.log { background: #000; color: #00e676; padding: 15px; font-family: monospace; border-radius: 4px; height: 260px; overflow-y: auto; font-size: 12px; line-height: 1.5; }
+.file-list { margin-top: 10px; background: #2a2a32; padding: 10px; border-radius: 4px; font-size: 13px; max-height: 150px; overflow-y: auto;}
+.genre-tag { color: #00e676; font-weight: bold; font-size: 11px; text-transform: uppercase; background: #121214; padding: 2px 6px; border-radius: 3px; margin-right: 5px;}
+.data-card { background: #121214; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #00e676; font-family: monospace; }
+.highlight { color: #fff; font-weight: bold; background: #222; padding: 2px 6px; border-radius: 3px; border: 1px solid #444; }
+.hex-view { background: #050505; color: #aaa; padding: 10px; border-radius: 4px; font-size: 11px; max-height: 120px; overflow-y: auto; margin-top: 10px; }
+.kbd-matrix { display: flex; gap: 4px; background: #121214; padding: 15px; border-radius: 6px; margin-top: 10px; overflow-x: auto; }
+.key { flex: 1; min-width: 25px; height: 90px; background: #fff; color: #000; text-align: center; line-height: 130px; font-size: 9px; font-weight: bold; border-radius: 0 0 3px 3px; cursor: pointer; position: relative; }
+.key.black { background: #000; color: #fff; height: 55px; margin-right: -10px; margin-left: -10px; z-index: 2; min-width: 16px; line-height: 75px;}
+.key.active-melody { background: #00e676 !important; color: #000; }
+.key.active-chord { background: #ff3d00 !important; color: #fff; }
+.badge { display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 13px; font-weight: bold; margin-left: 10px; }
+.bg-chord { background: #ff3d00; color: #fff; }
+.bg-melody { background: #00e676; color: #000; }
+.data-card { background: #121214; padding: 15px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #ff3d00; font-family: monospace; font-size: 14px; }
+.variation-rack {display: grid;  grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 5px; }		
+.btn-var {font-size: 11px;  padding: 8px;  border-color: #333; }
+.btn-var.active {background: linear-gradient(180deg, #00b0ff 0%, #0070a3 100%); border-color: #00e5ff;  color: #fff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);}  
+.btn-solo {font-size: 11px;  padding: 8px;  border-color: #333; }
+.btn-solo.active {background: linear-gradient(180deg, #00b0ff 0%, #0070a3 100%); border-color: #00e5ff;  color: #fff; box-shadow: 0 0 8px rgba(0, 176, 255, 0.4);} 		
+.control-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
+.control-row label { min-width: 90px; }
+button[aria-pressed="true"] { background: #ff7043; }
