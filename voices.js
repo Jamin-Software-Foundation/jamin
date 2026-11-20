@@ -22,6 +22,32 @@ export function createVoices(getAudio, getMixer, log) {
         'eq-low-frequency': 'lowFrequency', 'eq-low-gain': 'lowGain',
         'eq-high-frequency': 'highFrequency', 'eq-high-gain': 'highGain'
     };
+	
+	async function loadChunkedSF2(folderUrl, chunkCount) {
+	  // Fetch all chunks in parallel
+	  const urls = Array.from({ length: chunkCount }, (_, i) => 
+		`${folderUrl}/part_${String(i).padStart(2, '0')}`
+	  );
+
+	  const buffers = await Promise.all(
+		urls.map(url => fetch(url).then(res => {
+		  if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+		  return res.arrayBuffer();
+		}))
+	  );
+
+	  // Merge into one contiguous ArrayBuffer
+	  const totalBytes = buffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+	  const merged = new Uint8Array(totalBytes);
+	  
+	  let offset = 0;
+	  for (const buf of buffers) {
+		merged.set(new Uint8Array(buf), offset);
+		offset += buf.byteLength;
+	  }
+
+	  return merged.buffer;
+	}	
 
     function showSettings() {
         const voice = voices[selected];
@@ -86,8 +112,7 @@ export function createVoices(getAudio, getMixer, log) {
                 }
                 const target = voice.synth || created;
                 if (voice.file !== item) {
-                    const file = await item.getFile();
-                    const buffer = await file.arrayBuffer();
+                    const buffer = item.buffer;
                     if (request !== voice.request) { if (created) created.destroy(); return; }
                     if (voice.synth) release(voice);
                     await target.soundBankManager.addSoundBank(buffer, 'selected-soundfont');
@@ -140,28 +165,27 @@ export function createVoices(getAudio, getMixer, log) {
             window.renderTwoLevel($(`voice${index + 1}-browser`), views[index], groups, 'Connect a folder and scan for SoundFonts.');
         });
     }
-    async function readItem(getFile, path) {
-        const file = await getFile();
-        const bank = SoundBankLoader.fromArrayBuffer(await file.arrayBuffer());
+    async function readItem(entry) {
+		const path = entry.name;
+        const buffer = await loadChunkedSF2(entry.path, entry.children.length);		
+        const bank = SoundBankLoader.fromArrayBuffer(buffer);
         const patches = bank.presets.map((p, index) => ({
             name: p.name || `(Unnamed ${index + 1})`, program: p.program, bankMSB: p.bankMSB,
             bankLSB: p.bankLSB, isGMGSDrum: p.isGMGSDrum, key: String(index)
         }));
-        return { getFile, path, patches };
+        return { buffer, path, patches };
     }
     async function scan(root) {
         const generation = ++scanGeneration;
         const found = [];
         const errors = [];
         $('sf2-scan-status').textContent = 'Scanning SoundFonts and patches...';
-        async function walk(folder, path = '') {
-            for await (const entry of folder.values()) {
-                const name = path ? `${path}/${entry.name}` : entry.name;
-                if (entry.kind === 'directory') await walk(entry, name);
-                else if (/\.sf2$/i.test(entry.name)) {
-                    try { found.push(await readItem(() => entry.getFile(), name)); }
-                    catch (error) { errors.push(`${name}: ${error.message}`); }
-                }
+		
+        async function walk(folder) 
+		{
+            for (const entry of folder.children) {
+				try { found.push(await readItem(entry)); }
+				catch (error) { errors.push(`${name}: ${error.message}`); }
             }
         }
         try {

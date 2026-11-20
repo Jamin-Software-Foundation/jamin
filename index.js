@@ -42,13 +42,13 @@ for (const name of Object.keys(mixerState)) {
 const voices = createVoices(getAudio, ensureMixer, logger);
 
 document.getElementById('btn-scan-sf2').addEventListener('click', () => {
-	if (rootDirHandle) voices.scan(rootDirHandle);
+	if (rootDirJson) voices.scan(rootDirJson);
 });
 
 let recalling = false;
 let soloActive = false;
 let variationRequested = false;
-let rootDirHandle = null;
+let rootDirJson = null;
 let selectedStyleInfo = null;
 let styleLoading = false;
 
@@ -99,11 +99,14 @@ function logger(msg) {
 
 document.getElementById('btn-link-dir').addEventListener('click', async () => {
 	try {
-		if (!window.showDirectoryPicker) throw new Error('Folder access requires a supported Chromium browser in a secure context.');
-		const root = await window.showDirectoryPicker({ mode: 'readwrite', id: 'vibe-arranger'  });
-		document.getElementById('btn-link-dir').disabled = true;
+		switchOn(false);
+		const response = await fetch("./manifest.json");
+		const json = await response.json();
+		//console.debug("JSON", json);
+		switchOn(true);
+		
 		if (isPlaying) stopArranger();
-		rootDirHandle = root;
+		rootDirJson = json;
 		voices.cancelScan();
 		selectedStyleInfo = null;
 		loopAudioBuffers = { drums: {}, bass: {}, chords: {} };
@@ -113,36 +116,43 @@ document.getElementById('btn-link-dir').addEventListener('click', async () => {
 		document.getElementById('style-category').textContent = 'No category';
 		document.getElementById('style-tempo').textContent = '';
 		document.getElementById('btn-scan-sf2').disabled = false;
-		document.getElementById('txt-dir').innerText = `Linked: ${rootDirHandle.name}/`;
+
 		getAudio();
 		styleGroups = new Map();
 		styleView.open = null;
-		await scanStyleFolderDeep(root);
+		await scanStyleFolderDeep(json.list['USER_STYLE']);
 		renderStyles();
-		voices.scan(root);
+		voices.scan(json.list['VOICES']);
 	} catch (err) {
-		if (err.name !== 'AbortError') {
-			document.getElementById('txt-dir').textContent = `Folder error: ${err.message}`;
-			logger(`Folder error: ${err.message}`);
-		}
+		console.error("on-off error", err);
 	} finally {
-		document.getElementById('btn-link-dir').disabled = false;
+		switchOn(true);
 	}
 });
+
+function switchOn(flag) {
+	const onOffButton = document.getElementById('btn-link-dir');	
+	onOffButton.textContent = flag ? "ON" : "OFF";
+	onOffButton.disabled = !flag;
+	onOffButton.classList.toggle("active", flag);		
+}
 
 let styleGroups = new Map();
 const styleView = { open: null };
 
-async function scanStyleFolderDeep(folderHandle, currentPath = "") {
+async function scanStyleFolderDeep(json,  currentPath = "") {
 	let count = 0;
 	const entries = [];
-	for await (const entry of folderHandle.values()) entries.push(entry);
+	for await (const entry of json.children) entries.push(entry);
 	entries.sort((a, b) => a.name.localeCompare(b.name));
-	for (const entry of entries) {
-		if (entry.kind === 'directory') {
-			const subPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
+	
+	for (const entry of entries) 
+	{
+		if (entry.type === 'directory') {
+			const subPath = entry.name;			
 			count += await scanStyleFolderDeep(entry, subPath);
-		} else if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.kst')) {
+
+		} else if (entry.type === 'file' && entry.name.toLowerCase().endsWith('.kst')) {
 			count++;
 			const genre = currentPath || "Root";
 			if (!styleGroups.has(genre)) styleGroups.set(genre, []);
@@ -192,7 +202,7 @@ async function loadSelectedStyle() {
 	logger(`Reading file buffer bytes from: ${selectedStyleInfo.name}...`);
 	
 	try {
-		const file = await selectedStyleInfo.handle.getFile();
+		const file = await fetch(selectedStyleInfo.handle.path);
 		const buffer = await file.arrayBuffer();
 		loopAudioBuffers = {drums: {}, bass: {}, chords: {}};
 		await executeFixedBlockKshpParse(buffer);
@@ -307,7 +317,8 @@ function findStringInDecoderlessBuffer(buffer, searchString) {
 }
 
 async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
-	logger("Engine Populating......");   
+	logger("Engine Populating......"); 
+	
 	const playButton = document.querySelector("#btn-play");
 	playButton.disabled = true;
 	playButton.style.background = "#555"; 	
@@ -324,36 +335,30 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 	
 	const instrument = ["drums", "bass", "chords"];
 	const folderHandles = [];		
-	
-	let drumDirHandle, bassDirHandle, chordDirHandle;
-	let userModelingHandle = await rootDirHandle.getDirectoryHandle('USER_MODELING', { create: false });	
+	let userModelingHandle = rootDirJson.list['USER_MODELING'];	
 
-
-	try {
-		drumDirHandle = await userModelingHandle.getDirectoryHandle('LiveDrum', { create: false });	
+	try {	
 		folderHandles[0] = [];
-		folderHandles[0][0] = await drumDirHandle.getDirectoryHandle(drumFolder, { create: false });		
+		folderHandles[0][0] = rootDirJson.list['USER_MODELING'].list['LiveDrum'].list[drumFolder];
 	} catch (e) {
 		throw new Error("Missing LiveDrum folder: " + e.message);
 	}
 	
 	try {
-		bassDirHandle = await userModelingHandle.getDirectoryHandle('RealBass', { create: false });	
 		folderHandles[1] = [];					
-		for (const i in bassFolders) if (bassFolders[i] != "") folderHandles[1][i] = await bassDirHandle.getDirectoryHandle(bassFolders[i], { create: false });		
+		for (const i in bassFolders) if (bassFolders[i] != "") folderHandles[1][i] = rootDirJson.list['USER_MODELING'].list['RealBass'].list[bassFolders[i]];
 	} catch (e) {
 		//throw new Error("Missing RealBass folder: " + e.message);
 		console.warn("Missing RealBass Folder");		
 	}
 
 	try {
-		chordDirHandle = await userModelingHandle.getDirectoryHandle('RealChord', { create: false });
 		folderHandles[2] = [];			
-		for (const i in chordFolders) if (chordFolders[i] != "") folderHandles[2][i] = await chordDirHandle.getDirectoryHandle(chordFolders[i], { create: false });								
+		for (const i in chordFolders) if (chordFolders[i] != "") folderHandles[2][i] = rootDirJson.list['USER_MODELING'].list['RealChord'].list[chordFolders[i]];
 	} catch (e) {
 		//throw new Error("Missing RealChord folder: " + e.message);
 		console.warn("Missing RealChord Folder");
-	}									
+	}	
 	
 	for (const i in folderHandles) {
 		const handles = folderHandles[i];
@@ -361,10 +366,10 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 		for (const j in handles) {
 			const folderHandle = handles[j];
 			
-			for await (const handle of folderHandle.values()) {
+			for await (const handle of folderHandle.children) {
 				const fileName = handle.name.toLowerCase();
 				
-				if (handle.kind === 'file' && (fileName.endsWith('.wav') || fileName.endsWith('.ogg') || fileName.endsWith('.flac'))) {
+				if (handle.type === 'file' && (fileName.endsWith('.wav') || fileName.endsWith('.ogg') || fileName.endsWith('.flac'))) {
 					let keyName;
 					
 					if (i == 0) {
@@ -385,7 +390,7 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 						let audioData = loopAudioBuffers[instrument[i]][keyName];	
 						
 						if (!audioData) {
-							const file = await handle.getFile();
+							const file = await fetch(escape(handle.path));
 							const buffer = await file.arrayBuffer();								
 							audioData = await audioCtx.decodeAudioData(buffer);
 							loopAudioBuffers[instrument[i]][keyName] = audioData;									
@@ -1293,15 +1298,11 @@ const regSelect = document.getElementById('reg-select');
 const regName = n => `REG_${String(n).padStart(2, '0')}.json`;
 
 async function regFolder(create) {
-	return rootDirHandle ? rootDirHandle.getDirectoryHandle('REGISTRATIONS', { create }) : null;
+	return rootDirJson ? rootDirJson.getDirectoryHandle('REGISTRATIONS', { create }) : null;
 }
 
 async function readRegistration(n) {
-	try {
-		const folder = await regFolder(false);
-		if (folder) return await (await (await folder.getFileHandle(regName(n))).getFile()).text();
-	} catch (error) { if (error.name !== 'NotFoundError') logger(`Registration read error: ${error.message}`); }
-	return localStorage.getItem(`evm-reg-${n}`);
+	return localStorage.getItem(`jamin-registration-${n}`);
 }
 
 async function refreshRegistrations() {
@@ -1328,16 +1329,9 @@ async function saveRegistration(n) {
 	const text = JSON.stringify(captureRegistration(), null, 2);
 	let where = 'browser storage';
 	try {
-		const folder = await regFolder(true);
-		if (folder) {
-			const writable = await (await folder.getFileHandle(regName(n), { create: true })).createWritable();
-			await writable.write(text);
-			await writable.close();
-			where = `REGISTRATIONS/${regName(n)}`;
-		} else localStorage.setItem(`evm-reg-${n}`, text);
+		localStorage.setItem(`jamin-registration-${n}`, text);
 	} catch (error) {
-		logger(`Could not write registration file (${error.message}); saved in browser storage instead.`);
-		localStorage.setItem(`evm-reg-${n}`, text);
+		localStorage.setItem(`jamin-registration-${n}`, text);
 	}
 	logger(`Registration ${n} saved to ${where}.`);
 	refreshRegistrations();

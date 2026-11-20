@@ -6,7 +6,7 @@
     const consoleElement = document.createElement('main');
     consoleElement.className = 'console';
     consoleElement.innerHTML = `
-        <div class="topline"><span>JAMIN ARRANGER</span><span>A WEB AUDIO VERSION OF THE KETRON EVENT MODULE (EVM)</span></div>
+        <div class="topline"><span>JAMIN</span><span>A WEB AUDIO LIVE MUSIC ARRANGER</span></div>
         <div class="console-grid">
             <section class="panel-head" id="head-global"><small>System</small><strong>GLOBAL</strong><select id="reg-select" aria-label="Registration"></select></section>
             <section class="panel-head browse-head" data-browse="style" tabindex="0" role="button"><small>Style / <span id="style-category">No category</span></small><strong id="style-name">SELECT A STYLE</strong><span id="style-tempo"></span> <span id="style-chord"></span></section>
@@ -41,7 +41,7 @@
     old('file-display').remove();
     move('btn-parse', 'style-inspect');
     old('btn-parse').textContent = 'Load selected style';
-    old('btn-link-dir').textContent = 'Root folder';
+    old('btn-link-dir').textContent = 'OFF';
     old('btn-midi-init').textContent = 'MIDI';
     old('btn-scan-sf2').textContent = 'Scan SF2';
     for (const [id, text] of [['btn-reg-save', 'Save reg'], ['btn-reg-recall', 'Recall']]) {
@@ -78,7 +78,7 @@
         for (const item of open.items) add(item.label, item.selected ? 'selected' : '', item.onClick, item.title);
     };
     const browserViews = { style: 'style-browser', voice1: 'voice1-browser', voice2: 'voice2-browser' };
-    const browserTitles = { style: 'Styles', voice1: 'Voice 1 SoundFonts', voice2: 'Voice 2 SoundFonts' };
+    const browserTitles = { style: 'Styles', voice1: 'Voice 1', voice2: 'Voice 2' };
     window.showBrowser = view => {
         for (const [name, id] of Object.entries(browserViews)) old(id).hidden = name !== view;
         old('browser-title').textContent = browserTitles[view];
