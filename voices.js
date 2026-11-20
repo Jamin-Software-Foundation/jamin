@@ -1,5 +1,6 @@
 import { WorkletSynthesizer } from './spessasynth/spessasynth_lib.js';
 import { MIDIUtils, SoundBankLoader } from 'spessasynth_core';
+import { readAsset } from './imported-assets.js';
 
 export function createVoices(getAudio, getMixer, log) {
     const voices = [0, 1].map(() => ({
@@ -23,32 +24,6 @@ export function createVoices(getAudio, getMixer, log) {
         'eq-high-frequency': 'highFrequency', 'eq-high-gain': 'highGain'
     };
 	
-	async function loadChunkedSF2(folderUrl, chunkCount) {
-	  // Fetch all chunks in parallel
-	  const urls = Array.from({ length: chunkCount }, (_, i) => 
-		`${folderUrl}/part_${String(i).padStart(2, '0')}`
-	  );
-
-	  const buffers = await Promise.all(
-		urls.map(url => fetch(url).then(res => {
-		  if (!res.ok) throw new Error(`Failed to fetch ${url}`);
-		  return res.arrayBuffer();
-		}))
-	  );
-
-	  // Merge into one contiguous ArrayBuffer
-	  const totalBytes = buffers.reduce((sum, buf) => sum + buf.byteLength, 0);
-	  const merged = new Uint8Array(totalBytes);
-	  
-	  let offset = 0;
-	  for (const buf of buffers) {
-		merged.set(new Uint8Array(buf), offset);
-		offset += buf.byteLength;
-	  }
-
-	  return merged.buffer;
-	}	
-
     function showSettings() {
         const voice = voices[selected];
         $('selected-voice-label').textContent = `VOICE ${selected + 1}`;
@@ -112,7 +87,7 @@ export function createVoices(getAudio, getMixer, log) {
                 }
                 const target = voice.synth || created;
                 if (voice.file !== item) {
-                    const buffer = item.buffer;
+                    const buffer = item.buffer.slice(0);
                     if (request !== voice.request) { if (created) created.destroy(); return; }
                     if (voice.synth) release(voice);
                     await target.soundBankManager.addSoundBank(buffer, 'selected-soundfont');
@@ -166,8 +141,25 @@ export function createVoices(getAudio, getMixer, log) {
         });
     }
     async function readItem(entry) {
-		const path = entry.name;
-        const buffer = await loadChunkedSF2(entry.path, entry.children.length);		
+        const path = entry.displayPath || entry.name;
+        let buffer;
+        if (entry.type === 'directory') {
+            const parts = entry.children.filter(child => child.type === 'file' && /^part_\d+$/i.test(child.name))
+                .sort((a, b) => Number(a.name.slice(5)) - Number(b.name.slice(5)));
+            if (!parts.length || parts.some((part, index) => Number(part.name.slice(5)) !== index)) {
+                throw new Error('SoundFont parts must start at part_00 and be consecutive.');
+            }
+            const buffers = await Promise.all(parts.map(readAsset));
+            const merged = new Uint8Array(buffers.reduce((sum, part) => sum + part.byteLength, 0));
+            let offset = 0;
+            for (const part of buffers) { merged.set(new Uint8Array(part), offset); offset += part.byteLength; }
+            buffer = merged.buffer;
+        } else {
+            buffer = await readAsset(entry);
+        }
+        return makeItem(buffer, path);
+    }
+    function makeItem(buffer, path) {
         const bank = SoundBankLoader.fromArrayBuffer(buffer);
         const patches = bank.presets.map((p, index) => ({
             name: p.name || `(Unnamed ${index + 1})`, program: p.program, bankMSB: p.bankMSB,
@@ -181,11 +173,15 @@ export function createVoices(getAudio, getMixer, log) {
         const errors = [];
         $('sf2-scan-status').textContent = 'Scanning SoundFonts and patches...';
 		
-        async function walk(folder) 
-		{
-            for (const entry of folder.children) {
-				try { found.push(await readItem(entry)); }
-				catch (error) { errors.push(`${name}: ${error.message}`); }
+        async function walk(folder, prefix = '') {
+            for (const entry of folder?.children || []) {
+                const path = prefix ? `${prefix}/${entry.name}` : entry.name;
+                if (entry.type === 'directory' && !entry.children.some(child => /^part_\d+$/i.test(child.name))) {
+                    await walk(entry, path);
+                } else if (entry.type === 'directory' || /\.sf2$/i.test(entry.name)) {
+                    try { found.push(await readItem({ ...entry, displayPath: path })); }
+                    catch (error) { errors.push(`${path}: ${error.message}`); }
+                }
             }
         }
         try {
@@ -205,7 +201,7 @@ export function createVoices(getAudio, getMixer, log) {
         const file = event.target.files[0];
         if (!file) return;
         try {
-            const item = await readItem(() => Promise.resolve(file), file.name);
+            const item = makeItem(await file.arrayBuffer(), file.name);
             render([item]);
             if (item.patches.length) load(selected, item, item.patches[0]);
             else status(`No patches found in ${file.name}.`);

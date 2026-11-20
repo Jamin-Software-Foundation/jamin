@@ -28,6 +28,15 @@
     document.body.insertBefore(consoleElement, document.querySelector('script[type="module"]'));
     const move = (id, parent) => old(parent).appendChild(old(id));
     move('btn-link-dir', 'global-actions');
+    const importButton = document.createElement('button');
+    importButton.id = 'btn-import';
+    importButton.textContent = 'Import';
+    const importInput = document.createElement('input');
+    importInput.id = 'import-input';
+    importInput.type = 'file';
+    importInput.accept = '.zip,application/zip';
+    importInput.hidden = true;
+    old('global-actions').append(importButton, importInput);
     move('btn-midi-init', 'global-actions');
     move('btn-neouke', 'global-actions');		
     move('btn-scan-sf2', 'global-actions');
