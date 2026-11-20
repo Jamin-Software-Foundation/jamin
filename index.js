@@ -1,4 +1,5 @@
 import { createVoices } from "./voices.js";
+import { importAssets, mergeImportedAssets, readAsset, readAudioAsset } from "./imported-assets.js";
 
 let neoukeDevice = null;
 let audioCtx = null;
@@ -42,7 +43,7 @@ for (const name of Object.keys(mixerState)) {
 const voices = createVoices(getAudio, ensureMixer, logger);
 
 document.getElementById('btn-scan-sf2').addEventListener('click', () => {
-	if (rootDirJson) voices.scan(rootDirJson);
+	if (rootDirJson) voices.scan(rootDirJson.list['VOICES']);
 });
 
 let recalling = false;
@@ -51,6 +52,7 @@ let variationRequested = false;
 let rootDirJson = null;
 let selectedStyleInfo = null;
 let styleLoading = false;
+let assetsBusy = false;
 
 let currentProject = 0;
 let currentChordRoot = 0;
@@ -97,13 +99,17 @@ function logger(msg) {
 	document.getElementById('engine-status').textContent = msg;
 }
 
-document.getElementById('btn-link-dir').addEventListener('click', async () => {
+async function initializeAssets() {
+	let initialized = false;
+	assetsBusy = true;
 	try {
 		switchOn(false);
+		document.getElementById('btn-import').disabled = true;
+		document.getElementById('btn-scan-sf2').disabled = true;
 		const response = await fetch("./manifest.json");
+		if (!response.ok) throw new Error(`Could not load asset manifest: ${response.status}`);
 		const json = await response.json();
-		//console.debug("JSON", json);
-		switchOn(true);
+		await mergeImportedAssets(json);
 		
 		if (isPlaying) stopArranger();
 		rootDirJson = json;
@@ -115,18 +121,57 @@ document.getElementById('btn-link-dir').addEventListener('click', async () => {
 		document.getElementById('style-name').textContent = 'SELECT A STYLE';
 		document.getElementById('style-category').textContent = 'No category';
 		document.getElementById('style-tempo').textContent = '';
-		document.getElementById('btn-scan-sf2').disabled = false;
-
 		getAudio();
 		styleGroups = new Map();
 		styleView.open = null;
-		await scanStyleFolderDeep(json.list['USER_STYLE']);
+		if (json.list['USER_STYLE']) await scanStyleFolderDeep(json.list['USER_STYLE']);
 		renderStyles();
-		voices.scan(json.list['VOICES']);
+		await voices.scan(json.list['VOICES']);
+		logger('Assets ready.');
+		initialized = true;
+		return true;
 	} catch (err) {
-		console.error("on-off error", err);
+		rootDirJson = null;
+		logger(`Asset initialization failed: ${err.message}`);
+		console.error("Asset initialization failed", err);
+		return false;
 	} finally {
 		switchOn(true);
+		if (!initialized) {
+			document.getElementById('btn-link-dir').textContent = 'OFF';
+			document.getElementById('btn-link-dir').classList.remove('active');
+		}
+		document.getElementById('btn-import').disabled = false;
+		document.getElementById('btn-scan-sf2').disabled = !initialized;
+		assetsBusy = false;
+	}
+}
+
+document.getElementById('btn-link-dir').addEventListener('click', initializeAssets);
+document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-input').click());
+document.getElementById('import-input').addEventListener('change', async event => {
+	const file = event.target.files[0];
+	if (!file) return;
+	assetsBusy = true;
+	const button = document.getElementById('btn-import');
+	button.disabled = true;
+	document.getElementById('btn-link-dir').disabled = true;
+	document.getElementById('btn-scan-sf2').disabled = true;
+	try {
+		const count = await importAssets(file, getAudio(), text => {
+			document.getElementById('engine-status').textContent = text;
+		});
+		logger(`Imported ${count} files.`);
+		if (rootDirJson) await initializeAssets();
+	} catch (error) {
+		logger(`Import failed: ${error.message}`);
+		console.error('Import failed:', error);
+	} finally {
+		event.target.value = '';
+		button.disabled = false;
+		document.getElementById('btn-link-dir').disabled = false;
+		document.getElementById('btn-scan-sf2').disabled = !rootDirJson;
+		assetsBusy = false;
 	}
 });
 
@@ -149,7 +194,7 @@ async function scanStyleFolderDeep(json,  currentPath = "") {
 	for (const entry of entries) 
 	{
 		if (entry.type === 'directory') {
-			const subPath = entry.name;			
+			const subPath = currentPath ? `${currentPath}/${entry.name}` : entry.name;
 			count += await scanStyleFolderDeep(entry, subPath);
 
 		} else if (entry.type === 'file' && entry.name.toLowerCase().endsWith('.kst')) {
@@ -163,7 +208,7 @@ async function scanStyleFolderDeep(json,  currentPath = "") {
 }
 
 function selectStyle(entry, genre) {
-	if (styleLoading) return Promise.resolve();
+	if (styleLoading || assetsBusy) return Promise.resolve();
 	if (isPlaying) stopArranger();
 	selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
 	highlightSelection();
@@ -197,13 +242,13 @@ async function loadSelectedStyle() {
 	styleLoading = true;
 	document.getElementById('btn-play').disabled = true;
 	document.getElementById('btn-link-dir').disabled = true;
+	document.getElementById('btn-import').disabled = true;
 	document.getElementById('btn-parse').disabled = true;
 	document.querySelectorAll('#kst-items button').forEach(button => button.disabled = true);
 	logger(`Reading file buffer bytes from: ${selectedStyleInfo.name}...`);
 	
 	try {
-		const file = await fetch(selectedStyleInfo.handle.path);
-		const buffer = await file.arrayBuffer();
+		const buffer = await readAsset(selectedStyleInfo.handle);
 		loopAudioBuffers = {drums: {}, bass: {}, chords: {}};
 		await executeFixedBlockKshpParse(buffer);
 	} catch (error) {
@@ -213,6 +258,7 @@ async function loadSelectedStyle() {
 	} finally {
 		styleLoading = false;
 		document.getElementById('btn-link-dir').disabled = false;
+		document.getElementById('btn-import').disabled = false;
 		document.getElementById('btn-parse').disabled = false;
 		document.querySelectorAll('#kst-items button').forEach(button => button.disabled = false);
 	}
@@ -335,11 +381,10 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 	
 	const instrument = ["drums", "bass", "chords"];
 	const folderHandles = [];		
-	let userModelingHandle = rootDirJson.list['USER_MODELING'];	
-
 	try {	
 		folderHandles[0] = [];
 		folderHandles[0][0] = rootDirJson.list['USER_MODELING'].list['LiveDrum'].list[drumFolder];
+		if (!folderHandles[0][0]) throw new Error(drumFolder);
 	} catch (e) {
 		throw new Error("Missing LiveDrum folder: " + e.message);
 	}
@@ -365,6 +410,10 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 		
 		for (const j in handles) {
 			const folderHandle = handles[j];
+			if (!folderHandle) {
+				logger(`Missing ${instrument[i]} folder for variation ${j}.`);
+				continue;
+			}
 			
 			for await (const handle of folderHandle.children) {
 				const fileName = handle.name.toLowerCase();
@@ -390,9 +439,7 @@ async function scanAndLoadBuffers(drumFolder, bassFolders, chordFolders) {
 						let audioData = loopAudioBuffers[instrument[i]][keyName];	
 						
 						if (!audioData) {
-							const file = await fetch(escape(handle.path));
-							const buffer = await file.arrayBuffer();								
-							audioData = await audioCtx.decodeAudioData(buffer);
+							audioData = await readAudioAsset(handle, audioCtx);
 							loopAudioBuffers[instrument[i]][keyName] = audioData;									
 						}
 					}							
