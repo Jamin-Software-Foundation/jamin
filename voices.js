@@ -232,6 +232,12 @@ export function createVoices(getAudio, getMixer, log) {
                 }))
             };
         },
+        transposeBoth(step) {
+            if (voices.some(voice => voice.transpose + step < -12 || voice.transpose + step > 12)) return false;
+            voices.forEach(voice => { voice.transpose += step; });
+            showSettings();
+            return true;
+        },
         setState(state) {
             const missing = [];
             state.voices.forEach((saved, index) => {

@@ -1,5 +1,6 @@
 import { createVoices } from "./voices.js";
 import { importAssets, mergeImportedAssets, readAsset, readAudioAsset } from "./imported-assets.js";
+import { createGuitarInput, crkdProfile } from "./guitar-gamepad.js";
 
 let neoukeDevice = null;
 let audioCtx = null;
@@ -911,6 +912,7 @@ function changeStyleChord(detectedType, detectedRoot, detectedBass) {
 	const now = audioCtx.currentTime;	
 	const newSources = [];
 	
+	const chordVariation = Math.max(0, currentVariation) % 4;
 	activeSources.forEach(oldNode => 
 	{
 		if (oldNode.loopType == "drums") {
@@ -932,20 +934,20 @@ function changeStyleChord(detectedType, detectedRoot, detectedBass) {
 		let calculatedMelodicKey;
 
 		if (oldNode.loopType == "bass") {				
-			if (detectedType === "Maj") calculatedMelodicKey = (currentVariation % 4) + "_BMAJ_" + noteNames[targetBassAssetIndex];
-			if (detectedType === "Min") calculatedMelodicKey = (currentVariation % 4) + "_BMIN_" + noteNames[targetBassAssetIndex];
-			if (detectedType === "7th") calculatedMelodicKey = (currentVariation % 4) + "_BMAJ_" + noteNames[targetBassAssetIndex];
-			if (detectedType === "Min7") calculatedMelodicKey = (currentVariation % 4) + "_BMIN_" + noteNames[targetBassAssetIndex];
-			if (detectedType === "Sus2" || detectedType === "Sus4") calculatedMelodicKey = (currentVariation % 4) + "_BMAJ_" + noteNames[targetBassAssetIndex];
+			if (detectedType === "Maj") calculatedMelodicKey = chordVariation + "_BMAJ_" + noteNames[targetBassAssetIndex];
+			if (detectedType === "Min") calculatedMelodicKey = chordVariation + "_BMIN_" + noteNames[targetBassAssetIndex];
+			if (detectedType === "7th") calculatedMelodicKey = chordVariation + "_BMAJ_" + noteNames[targetBassAssetIndex];
+			if (detectedType === "Min7") calculatedMelodicKey = chordVariation + "_BMIN_" + noteNames[targetBassAssetIndex];
+			if (detectedType === "Sus2" || detectedType === "Sus4") calculatedMelodicKey = chordVariation + "_BMAJ_" + noteNames[targetBassAssetIndex];
 		}
 		else 
 		
 		if (oldNode.loopType == "chords") {					
-			if (detectedType === "Maj") calculatedMelodicKey = (currentVariation % 4) + "_MAJ_" + noteNames[targetAssetIndex];
-			if (detectedType === "Min") calculatedMelodicKey = (currentVariation % 4) + "_MIN_" + noteNames[targetAssetIndex];
-			if (detectedType === "7th") calculatedMelodicKey = (currentVariation % 4) + "_7TH_" + noteNames[targetAssetIndex];
-			if (detectedType === "Min7") calculatedMelodicKey = (currentVariation % 4) + "_MIN_" + noteNames[targetAssetIndex];
-			if (detectedType === "Sus2" || detectedType === "Sus4") calculatedMelodicKey = (currentVariation % 4) + "_SUS_" + noteNames[targetAssetIndex];
+			if (detectedType === "Maj") calculatedMelodicKey = chordVariation + "_MAJ_" + noteNames[targetAssetIndex];
+			if (detectedType === "Min") calculatedMelodicKey = chordVariation + "_MIN_" + noteNames[targetAssetIndex];
+			if (detectedType === "7th") calculatedMelodicKey = chordVariation + "_7TH_" + noteNames[targetAssetIndex];
+			if (detectedType === "Min7") calculatedMelodicKey = chordVariation + "_MIN_" + noteNames[targetAssetIndex];
+			if (detectedType === "Sus2" || detectedType === "Sus4") calculatedMelodicKey = chordVariation + "_SUS_" + noteNames[targetAssetIndex];
 		}
 		
 		if (calculatedMelodicKey && hasBuffers([[oldNode.loopType, calculatedMelodicKey]])) {
@@ -1449,6 +1451,83 @@ window.setVariation = function(varNo) {
 	if (currentChordType !== null) changeStyleChord(currentChordType, currentChordRoot, currentBassRoot);
 	//logger(`Queued drum variation ${targetKey}${fillKey ? ` with ${fillKey}` : ""}.`);
 };
+
+const guitarButton = document.getElementById('btn-guitar');
+const guitarStatus = document.getElementById('guitar-status');
+let guitarEnabled = false;
+let guitarIndex = null;
+let guitarFrame = null;
+const guitarInput = createGuitarInput(crkdProfile, {
+	toggle() {
+		if (isPlaying) stopArranger();
+		else if (!document.getElementById('btn-play').disabled) toggleStartEndArranger();
+		else logger('Load a style before starting the arranger.');
+	},
+	chord(type, root, bass) {
+		variationRequested = true;
+		changeStyleChord(type, root, bass);
+		const key = noteNames.indexOf(keyInput.value);
+		const rootName = noteNames[(key + root) % 12];
+		const bassName = noteNames[(key + bass) % 12];
+		document.getElementById('out-chord').innerText = `${rootName} ${type}${root === bass ? '' : ` / ${bassName}`}`;
+	},
+	variation: letter => setVariationLetter(letter),
+	nextVariation: () => setVariationLetter((currentVariation + 1) % 4),
+	transpose(step) {
+		if (!voices.transposeBoth(step)) return logger('Voice transpose limit reached.');
+		keyInput.value = noteNames[(noteNames.indexOf(keyInput.value) + step + 12) % 12];
+		if (isPlaying && !endingScheduled) {
+			variationRequested = true;
+			changeStyleChord(currentChordType, currentChordRoot, currentBassRoot);
+		}
+		const key = noteNames.indexOf(keyInput.value);
+		const root = noteNames[(key + currentChordRoot) % 12];
+		const bass = noteNames[(key + currentBassRoot) % 12];
+		document.getElementById('out-chord').innerText = `${root} ${currentChordType}${currentChordRoot === currentBassRoot ? '' : ` / ${bass}`}`;
+		logger(`Guitar transpose: arranger key ${keyInput.value}, both voices ${step > 0 ? '+' : ''}${step} semitone.`);
+	}
+});
+
+function pollGuitar() {
+	if (!guitarEnabled) return;
+	let pads;
+	try {
+		pads = navigator.getGamepads();
+	} catch (error) {
+		guitarEnabled = false;
+		guitarButton.textContent = 'Enable guitar';
+		guitarButton.classList.remove('active');
+		guitarStatus.textContent = 'Guitar unavailable';
+		logger(`Gamepad access failed: ${error.message}`);
+		return;
+	}
+	let pad = guitarIndex === null ? null : pads[guitarIndex];
+	if (!pad || !pad.connected || pad.mapping !== 'standard') {
+		guitarInput.reset();
+		pad = Array.from(pads).find(candidate => candidate?.connected && candidate.mapping === 'standard');
+		guitarIndex = pad ? pad.index : null;
+		guitarStatus.textContent = pad ? `Guitar: ${pad.id}` : 'Waiting for standard gamepad';
+	}
+	if (pad) guitarInput.update(pad);
+	guitarFrame = requestAnimationFrame(pollGuitar);
+}
+
+guitarButton.addEventListener('click', () => {
+	if (guitarEnabled) {
+		guitarEnabled = false;
+		cancelAnimationFrame(guitarFrame);
+		guitarInput.reset();
+		guitarIndex = null;
+		guitarStatus.textContent = 'Guitar off';
+	} else {
+		if (!navigator.getGamepads) return logger('Gamepad API is unavailable in this browser.');
+		guitarEnabled = true;
+		guitarStatus.textContent = 'Waiting for standard gamepad';
+		pollGuitar();
+	}
+	guitarButton.textContent = guitarEnabled ? 'Disable guitar' : 'Enable guitar';
+	guitarButton.classList.toggle('active', guitarEnabled);
+});
 		
 buildExtendedKeyboard();
 

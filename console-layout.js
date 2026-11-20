@@ -38,11 +38,13 @@
     importInput.hidden = true;
     old('global-actions').append(importButton, importInput);
     move('btn-midi-init', 'global-actions');
+    move('btn-guitar', 'global-actions');
     move('btn-neouke', 'global-actions');		
     move('btn-scan-sf2', 'global-actions');
     move('btn-solo', 'global-actions');		
     move('txt-dir', 'global-status');
     move('midi-status', 'global-status');
+    move('guitar-status', 'global-status');
     move('sf2-scan-status', 'global-status');
     move('status', 'global-status');
 
