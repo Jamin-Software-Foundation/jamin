@@ -1271,6 +1271,7 @@ function triggerChordEvaluationBuffer() {
 
 function analyzeFullKeyboardHarmony() {
 	if (activeNotes.size < 3) return;
+	if (guitarEnabled) return;			// Guitar get priorty to decide chords
 
 	// Sort notes numerically to ensure notesArray[0] is always the absolute lowest physical bass note
 	const notesArray = Array.from(activeNotes.keys()).sort((a, b) => a - b);
@@ -1457,6 +1458,7 @@ const guitarStatus = document.getElementById('guitar-status');
 let guitarEnabled = false;
 let guitarIndex = null;
 let guitarFrame = null;
+
 const guitarInput = createGuitarInput(crkdProfile, {
 	toggle(frets) {
 		if (isPlaying) 
