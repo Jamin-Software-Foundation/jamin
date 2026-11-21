@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SF2 On-Demand Chunker</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+    .box { border: 2px dashed #888; padding: 25px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+    button { background: #0066cc; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-size: 16px; cursor: pointer; margin: 5px; }
+    button:disabled { background: #aaa; cursor: not-allowed; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+    #status { font-weight: bold; margin-top: 15px; color: #333; }
+    .note { font-size: 13px; color: #666; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>SF2 On-Demand Chunker</h2>
+  <p>Pick your project root folder, then select the <code>.sf2</code> file(s) you want to chunk into <code>/assets/SF2/&lt;instrument&gt;/</code>.</p>
+
+  <div class="box">
+    <button id="pickDirBtn">1. Select Project Root Folder</button>
+    <div id="dirLabel" style="margin: 10px 0; font-weight: 600; color: #0066cc;">No folder selected</div>
+    
+    <input type="file" id="fileInput" accept=".sf2,.sf3" multiple disabled /><br><br>
+    <label>Chunk Size (MB): <input type="number" id="chunkSizeMB" value="45" min="1" max="95" style="width: 60px;"></label><br><br>
+    <button id="splitBtn" disabled>2. Write Chunks</button>
+    <div id="status"></div>
+    <div class="note">Run via <code>http://localhost</code> in Chrome or Edge.</div>
+  </div>
+
+  <div id="output" style="display:none;">
+    <h3>Loader Code for Your App:</h3>
+    <pre id="codeSnippet"></pre>
+  </div>
+
+  <script>
+    let rootDirHandle = null;
+
+    const pickDirBtn = document.getElementById('pickDirBtn');
+    const dirLabel = document.getElementById('dirLabel');
+    const fileInput = document.getElementById('fileInput');
+    const splitBtn = document.getElementById('splitBtn');
+    const status = document.getElementById('status');
+    const output = document.getElementById('output');
+    const codeSnippet = document.getElementById('codeSnippet');
+
+    pickDirBtn.addEventListener('click', async () => {
+      try {
+        rootDirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        dirLabel.textContent = `Project Root: /${rootDirHandle.name}/`;
+        fileInput.disabled = false;
+        splitBtn.disabled = !fileInput.files.length;
+      } catch (err) {
+        if (err.name !== 'AbortError') alert('Folder error: ' + err.message);
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      splitBtn.disabled = !(rootDirHandle && fileInput.files.length);
+      status.textContent = '';
+    });
+
+    splitBtn.addEventListener('click', async () => {
+      const files = Array.from(fileInput.files);
+      if (!rootDirHandle || !files.length) return;
+
+      splitBtn.disabled = true;
+      const chunkMB = parseInt(document.getElementById('chunkSizeMB').value, 10) || 45;
+      const chunkSize = chunkMB * 1024 * 1024;
+
+      try {
+        const assetsDir = await rootDirHandle.getDirectoryHandle('assets', { create: true });
+        const sf2ParentDir = await assetsDir.getDirectoryHandle('SF2', { create: true });
+        const generatedCalls = [];
+
+        for (const file of files) {
+          const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, '_');
+          const instDir = await sf2ParentDir.getDirectoryHandle(cleanName, { create: true });
+          const totalChunks = Math.ceil(file.size / chunkSize);
+
+          for (let i = 0; i < totalChunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const blob = file.slice(start, end);
+            const partName = `part_${String(i).padStart(2, '0')}`;
+
+            status.textContent = `Writing /assets/SF2/${cleanName}/${partName} (${i + 1}/${totalChunks})...`;
+
+            const fileHandle = await instDir.getFileHandle(partName, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+          }
+
+          generatedCalls.push(`const ${cleanName}Buffer = await loadChunkedSF2('./assets/SF2/${cleanName}', ${totalChunks});`);
+        }
+
+        status.textContent = `Done! Wrote ${files.length} SoundFont(s) to /assets/SF2/.`;
+        output.style.display = 'block';
+        codeSnippet.textContent = generatedCalls.join('\n');
+      } catch (err) {
+        status.textContent = 'Error: ' + err.message;
+      } finally {
+        splitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

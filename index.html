@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jamin</title>
+	<link rel="icon" type="image/x-icon" href="./favicon.png"> 
+	<link rel="manifest"   href="./web-manifest.json" />		
+    <script type="importmap">
+    {
+        "imports": {
+            "spessasynth_core": "./spessasynth/spessasynth_core.js",
+            "fflate": "./spessasynth/fflate.js",
+            "stb-vorbis": "./spessasynth/stb-vorbis.js"
+        }
+    }
+    </script>	
+    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./console.css">
+</head>
+<body>
+    <h1>🎹 Jamin</h1>
+    <p>A web audio live music arranger</p>
+
+    <!-- STORAGE PICKER -->
+    <div class="box">
+        <h3>1. Connect Storage Folder</h3>
+        <button id="btn-link-dir">Select Ketron Root Folder</button>
+        <p id="txt-dir" style="color: #aaa;">Status: Connect a directory to view style items.</p>
+        
+        <div id="file-display" class="file-list" style="display:none;">
+            <strong>Select a `.KST` File to Analyze:</strong>
+            <div id="kst-items"></div>
+        </div>
+        <button class="btn-solo" id="btn-solo">SOLO OFF</button>		
+        <button class="btn-neouke" id="btn-neouke">NeoUke</button>			
+    </div>
+
+    <!-- TARGET EXTRACTOR CONTROL -->
+    <div class="box">
+        <h3>2. KSHP Header Memory Assignment</h3>
+        <button id="btn-parse" style="display:none" disabled>Inspect & Extract KSHP Block Boundaries</button>
+        
+        <div class="data-card">
+            <div>⏱️ Native Track Tempo: <span id="out-tempo" class="highlight">-- BPM</span></div><br>
+            <div>🥁 LiveDrum Subfolder Path: <span id="out-drum" class="highlight">--</span></div><br><br>
+            <div>🎸 RealBass ARRA Subfolder Path: <span id="out-bass1" class="highlight">--</span></div>
+            <div>🎸 RealBass ARRB Subfolder Path: <span id="out-bass2" class="highlight">--</span></div>
+            <div>🎸 RealBass ARRC Subfolder Path: <span id="out-bass3" class="highlight">--</span></div>
+            <div>🎸 RealBass ARRD Subfolder Path: <span id="out-bass4" class="highlight">--</span></div><br>
+            <div>🎹 RealChord ARRA Subfolder Path: <span id="out-chord1" class="highlight">--</span></div>
+            <div>🎹 RealChord ARRB Subfolder Path: <span id="out-chord2" class="highlight">--</span></div>
+            <div>🎹 RealChord ARRC Subfolder Path: <span id="out-chord3" class="highlight">--</span></div>
+            <div>🎹 RealChord ARRD Subfolder Path: <span id="out-chord4" class="highlight">--</span></div><br>
+        </div>
+    </div>
+	
+	<div class="box">
+		<h3>3. Sound Font Synth</h3>
+		<p>Choose a SoundFont from the connected root folder or upload one directly.</p>
+		<button id="btn-scan-sf2" disabled>Scan Root for SoundFonts</button>
+		<label for="sf2-picker">SoundFont:</label>
+		<select id="sf2-picker" disabled><option value="">Scan the root folder first</option></select>
+		<p id="sf2-scan-status" role="status">Connect a root folder to scan for .sf2 files.</p>
+		
+		<!-- File Input -->
+		<input type="file" id="sf2-input" accept=".sf2">
+		
+		<!-- Note Play Trigger -->
+		<button id="sf2-play-btn" disabled>Play Test Note (C4 Piano)</button>
+		
+		<!-- Status Readout -->
+		<div id="status">Status: Waiting for SoundFont...</div>
+	</div>	
+
+    <!-- MIDI HARDWARE ENGINE HUB -->
+    <div class="box">
+        <h3>4. Hardware Connection</h3>
+        <button id="btn-midi-init">Initialize Browser Web MIDI Drivers</button>
+        <span id="midi-status" class="badge" style="background:#555;">Disconnected</span>
+        <button id="btn-guitar">Guitar Off</button>
+        <span id="guitar-status" class="badge" role="status">Guitar off</span>
+    </div>
+
+    <div class="box">
+        <h3>5. Pitch-Compensated Loop Sync Engine</h3>
+        <label>Arranger Key: </label>
+        <select id="ctrl-key">
+            <option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
+            <option value="D#">D#</option><option value="E">E</option><option value="F">F</option>
+            <option value="F#">F#</option><option value="G">G</option><option value="G#">G#</option>
+            <option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
+        </select>
+        
+        <br><br>
+        <label id="lbl-tempo">Tempo Shift Step: 0</label><br>
+        <input type="range" id="ctrl-tempo" min="-6" max="6" value="0" step="1">
+
+        <br><br>
+        <button id="btn-play" style="background: #555; color: #fff;">START</button>
+        <button id="btn-stop" style="background: #555; color: #fff;">STOP</button>
+    </div>
+	
+    <!-- LIVE CHORD SCANNER MONITOR -->
+    <div class="box">
+        <h3>6. Full-Keyboard Arranger State</h3>
+        <p>Play individual melody notes anywhere (lights up <span class="badge bg-melody">Green</span>). Strike a 3+ note chord voicing anywhere to drive accompaniment changes (lights up <span class="badge bg-chord">Red</span>).</p>
+        
+        <div class="data-card">
+            <div>🎼 Detected Accompaniment Chord: <span id="out-chord" class="highlight">NO CHORD (IDLE)</span></div>
+            <div style="margin-top: 8px;">💿 Target Loop Asset Mapping: <span id="out-asset" class="highlight">--</span></div>
+        </div>
+
+        <!-- VISUAL HARDWARE MONITOR LAYER -->
+        <div class="kbd-matrix" id="virtual-keyboard"></div>
+		
+		<div class="data-card">
+			<h3>🕹️ Arranger Style Variations</h3>
+			<div class="variation-rack">
+				<button class="btn-var active" onclick="setVariationLetter(0)">ARR A</button>
+				<button class="btn-var" onclick="setVariationLetter(1)">ARR B</button>
+				<button class="btn-var" onclick="setVariationLetter(2)">ARR C</button>
+				<button class="btn-var" onclick="setVariationLetter(3)">ARR D</button>
+				<button id="btn-arr-x" aria-pressed="false" onclick="toggleAltVariation()">VAR 1-4</button>
+				<button id="btn-fil-x" onclick="playFillX()">FILL</button>
+				<button id="btn-brk-x" onclick="playBreakX()">BREAK</button>
+			</div>
+			<p><label><input type="checkbox" checked id="auto-fill"> AutoFill</label></p>
+		</div>			
+    </div>
+	
+    <div class="box">
+        <h3>7. Mixer</h3>
+        <p>Track levels apply to live playback, including loop transitions and the SoundFont synth.</p>
+        <div class="control-row"><label for="volume-drums">Drums</label><input id="volume-drums" type="range" min="0" max="100" value="100"><output id="level-drums">100%</output><button id="mute-drums" aria-pressed="false">Mute drums</button></div>
+        <div class="control-row"><label for="volume-bass">Bass</label><input id="volume-bass" type="range" min="0" max="100" value="100"><output id="level-bass">100%</output><button id="mute-bass" aria-pressed="false">Mute bass</button></div>
+        <div class="control-row"><label for="volume-chords">Chord</label><input id="volume-chords" type="range" min="0" max="100" value="100"><output id="level-chords">100%</output><button id="mute-chords" aria-pressed="false">Mute chord</button></div>
+        <div class="control-row"><label for="volume-synth">Synth</label><input id="volume-synth" type="range" min="0" max="100" value="100"><output id="level-synth">100%</output><button id="mute-synth" aria-pressed="false">Mute synth</button></div>
+        <div class="control-row"><label for="volume-master">Master</label><input id="volume-master" type="range" min="0" max="100" value="100"><output id="level-master">100%</output><button id="mute-master" aria-pressed="false">Mute master</button></div>
+    </div>
+
+    <div class="box">
+        <h3>8. Synth Effects</h3>
+        <p>One insertion effect at a time applies to the SoundFont synth, not the audio loops. Selecting Symphonic switches to XG mode; GS EQ is unavailable in that mode.</p>
+        <div class="control-row">
+            <label for="effect-type">Insertion</label>
+            <select id="effect-type">
+                <option value="0">Off</option>
+                <option value="293">Tremolo</option><option value="294">Auto Pan</option>
+                <option value="288">Phaser</option><option value="289">Auto Wah</option>
+                <option value="290">Rotary Speaker</option><option value="symphonic">Symphonic (XG)</option>
+                <option value="273">Distortion</option><option value="272">Overdrive</option>
+            </select>
+        </div>
+        <fieldset id="gs-eq">
+            <legend>GS Equalizer</legend>
+            <div class="control-row"><label for="eq-low-frequency">Low frequency</label><select id="eq-low-frequency"><option value="0">225 Hz</option><option value="1">425 Hz</option></select><label for="eq-low-gain">Low gain</label><input id="eq-low-gain" type="range" min="-12" max="12" value="0"><output id="eq-low-output">0 dB</output></div>
+            <div class="control-row"><label for="eq-high-frequency">High frequency</label><select id="eq-high-frequency"><option value="0">3 kHz</option><option value="1">6 kHz</option></select><label for="eq-high-gain">High gain</label><input id="eq-high-gain" type="range" min="-12" max="12" value="0"><output id="eq-high-output">0 dB</output></div>
+        </fieldset>
+    </div>
+
+    <h3>System Output Log</h3>
+    <div id="log-window" class="log">Engine waiting to initialize...</div>
+
+	<script src="./console-layout.js"></script>
+	<script type="module" src="./index.js"></script>
+</body>
+</html>
