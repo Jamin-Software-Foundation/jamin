@@ -14,10 +14,15 @@ const styleView = { open: null }, noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', '
 const mixerState = Object.fromEntries(['drums', 'bass', 'chords', 'voice1', 'voice2', 'master'].map(n => [n, { volume: 1, muted: false }]));
 const getAudio = () => (audioCtx ||= new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' }));
 
+const VOICE_GAIN_BOOST = 2.8;
+const getChannelGain = (n) => (mixerState[n].muted ? 0 : mixerState[n].volume * (n === 'voice1' || n === 'voice2' ? VOICE_GAIN_BOOST : 1));
+
 function ensureMixer() {
   if (mixer) return mixer; getAudio(); mixer = {};
-  for (const n of Object.keys(mixerState)) { mixer[n] = audioCtx.createGain(); mixer[n].gain.value = mixerState[n].muted ? 0 : mixerState[n].volume; }
-  mixer.master.connect(audioCtx.destination);
+  for (const n of Object.keys(mixerState)) { mixer[n] = audioCtx.createGain(); mixer[n].gain.value = getChannelGain(n); }
+  const limiter = audioCtx.createDynamicsCompressor();
+  limiter.threshold.value = -3; limiter.knee.value = 6; limiter.ratio.value = 12; limiter.attack.value = 0.003; limiter.release.value = 0.15;
+  mixer.master.connect(limiter); limiter.connect(audioCtx.destination);
   for (const n of ['drums', 'bass', 'chords', 'voice1', 'voice2']) mixer[n].connect(mixer.master);
   return mixer;
 }
@@ -25,7 +30,7 @@ function ensureMixer() {
 const mixerUpdaters = {};
 for (const n of Object.keys(mixerState)) {
   const slider = document.getElementById(`volume-${n}`), mute = document.getElementById(`mute-${n}`);
-  const update = () => { document.getElementById(`level-${n}`).textContent = `${Math.round(mixerState[n].volume * 100)}%`; mute.setAttribute('aria-pressed', String(mixerState[n].muted)); if (mixer) mixer[n].gain.setValueAtTime(mixerState[n].muted ? 0 : mixerState[n].volume, audioCtx.currentTime); };
+  const update = () => { document.getElementById(`level-${n}`).textContent = `${Math.round(mixerState[n].volume * 100)}%`; mute.setAttribute('aria-pressed', String(mixerState[n].muted)); if (mixer) mixer[n].gain.setValueAtTime(getChannelGain(n), audioCtx.currentTime); };
   mixerUpdaters[n] = () => { slider.value = Math.round(mixerState[n].volume * 100); update(); };
   slider.addEventListener('input', () => { mixerState[n].volume = Number(slider.value) / 100; update(); });
   mute.addEventListener('click', () => { mixerState[n].muted = !mixerState[n].muted; update(); });
@@ -39,14 +44,30 @@ function logger(msg) {
 
 const voices = createVoices(getAudio, ensureMixer, logger);
 const tempoInput = document.getElementById('ctrl-tempo'), keyInput = document.getElementById('ctrl-key');
-
-// Proxy holder so arranger & crkdBridge can reference each other cleanly
 const bridgeRef = { strummer: null };
-const arranger = createArrangerPlayer({ getAudio, ensureMixer, strummer: { clock: { set bpm(v) { if (bridgeRef.strummer) bridgeRef.strummer.clock.bpm = v; } }, syncBarStart: t => bridgeRef.strummer?.syncBarStart(t), stop: () => bridgeRef.strummer?.stop() }, logger });
+
+const arranger = createArrangerPlayer({
+  getAudio, ensureMixer,
+  strummer: {
+    clock: {
+      get isRunning() { return Boolean(bridgeRef.strummer?.clock.isRunning); },
+      get barStartTimeSec() { return bridgeRef.strummer?.clock.barStartTimeSec ?? null; },
+      set bpm(v) { if (bridgeRef.strummer) bridgeRef.strummer.clock.bpm = v; }
+    },
+    syncBarStart: t => bridgeRef.strummer?.syncBarStart(t),
+    stop: () => bridgeRef.strummer?.stop()
+  },
+  logger
+});
+
 const { strummer, isGuitarEnabled } = createCrkdBridge({ getAudio, voices, arranger, mixerState, mixerUpdaters, getRegs: () => regs, logger });
 bridgeRef.strummer = strummer;
 
-const strumSeqBrowser = createStrumSeqBrowser('strumseq-browser', 'strumseq-status', xml => strummer.loadStrumSeqXML(xml, true), logger);
+const strumSeqBrowser = createStrumSeqBrowser('strumseq-browser', 'strumseq-status', xml => {
+  const hasStyle = Boolean(selectedStyleInfo);
+  strummer.loadStrumSeqXML(xml, hasStyle); // keepCurrentBpm = true whenever a style is selected!
+}, logger);
+
 
 async function initializeAssets() {
   const json = await (await fetch('./manifest.json')).json();
@@ -80,11 +101,21 @@ document.getElementById('btn-scan-sf2').addEventListener('click', () => rootDirJ
 document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-input').click());
 document.getElementById('import-input').addEventListener('change', async e => { if (e.target.files) { await importAssets(e.target.files, getAudio(), () => {}); if (rootDirJson) await initializeAssets(); } });
 document.querySelectorAll('.intro-choice').forEach(b => b.addEventListener('click', () => { arranger.setIntroEnding(Number(b.dataset.intro)); document.querySelectorAll('.intro-choice').forEach(c => c.setAttribute('aria-pressed', String(c === b))); }));
-tempoInput.addEventListener('input', e => { const s = arranger.getState(); document.getElementById('style-tempo').textContent = `${Math.ceil(s.tempo * Math.pow(2, e.target.value / 12))} BPM`; if (s.isPlaying) arranger.restart(); });
-keyInput.addEventListener('change', () => { if (arranger.getState().isPlaying) arranger.restart(); });
 document.getElementById('btn-play').addEventListener('click', arranger.toggleStartEnd);
 document.getElementById('btn-stop').addEventListener('click', arranger.stopImmediate);
 document.getElementById('btn-solo').addEventListener('click', () => document.getElementById('btn-solo').classList.toggle('active', arranger.toggleSolo()));
+
+tempoInput.addEventListener('input', e => {
+  const s = arranger.getState();
+  const effectiveBpm = Math.ceil(s.tempo * Math.pow(2, e.target.value / 12));
+  document.getElementById('style-tempo').textContent = `${effectiveBpm} BPM`;
+  strummer.clock.bpm = effectiveBpm;
+  if (s.isPlaying) arranger.restart();
+});
+
+keyInput.addEventListener('change', () => { 
+	if (arranger.getState().isPlaying) arranger.restart(); 
+});
 
 window.setVariation = arranger.setVariation; window.setVariationLetter = arranger.setVarLetter; window.toggleAltVariation = arranger.toggleAlt;
 window.playFillX = () => arranger.playFill(Math.max(0, arranger.getState().currentVariation)); window.playBreakX = arranger.playBreak;
@@ -101,7 +132,7 @@ regs = createRegistrationManager({
     if (reg.guitar) {
       strummer.playMode = reg.guitar.playMode || 'STRUMSEQ'; strummer.autoHold = Boolean(reg.guitar.autoHold); strummer.voice.noiseMode = reg.guitar.noiseMode || 'MUTED_SYNC';
       if (reg.guitar.strumSeqPath && !strumSeqBrowser.selectByPath(reg.guitar.strumSeqPath)) missing.push(`StrumSeq: ${reg.guitar.strumSeqPath}`);
-      strummer.syncClock(); strummer.emitState();
+      strummer.syncModeReverb?.(); strummer.syncClock(); strummer.emitState();
     }
     logger(`Registration ${n} recalled.${missing.length ? ` Missing: ${missing.join(', ')}` : ''}`);
   }

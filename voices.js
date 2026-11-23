@@ -44,28 +44,41 @@ export function createVoices(getAudio, getMixer, log) {
     const xg = voice.effect === 'symphonic';
     const mode = xg ? 'xg' : 'gs';
     if (voice.mode !== mode) {
-      target.systemExclusive(xg ? MIDIUtils.xg(0, 0, 126, [0]) : MIDIUtils.gs(64, 0, 127, [0]));
+      target.systemExclusive(xg ? MIDIUtils.xg(0, 0, 126, Array.of(0)) : MIDIUtils.gs(64, 0, 127, Array.of(0)));
       voice.mode = mode;
     }
     if (xg) {
-      target.systemExclusive(MIDIUtils.xg(3, 0, 0, [0x44, 0]));
-      target.systemExclusive(MIDIUtils.xg(3, 0, 12, [0]));
+      target.systemExclusive(MIDIUtils.xg(3, 0, 0, Array.of(0x44, 0)));
+      target.systemExclusive(MIDIUtils.xg(3, 0, 12, Array.of(0)));
     } else {
       const type = Number(voice.effect);
-      target.systemExclusive(MIDIUtils.gs(64, 3, 0, [type >> 8, type & 127]));
-      target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x22, [type ? 1 : 0]));
-      target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x20, [1]));
-      [Number(voice.lowFrequency), Number(voice.lowGain) + 64, Number(voice.highFrequency), Number(voice.highGain) + 64]
-        .forEach((value, address) => target.systemExclusive(MIDIUtils.gs(64, 2, address, [value])));
+      target.systemExclusive(MIDIUtils.gs(64, 3, 0, Array.of(type >> 8, type & 127)));
+      target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x22, Array.of(type ? 1 : 0)));
+      target.systemExclusive(MIDIUtils.gs(64, 0x41, 0x20, Array.of(1)));
+      Array.of(
+        Number(voice.lowFrequency),
+        Number(voice.lowGain) + 64,
+        Number(voice.highFrequency),
+        Number(voice.highGain) + 64
+      ).forEach((value, address) => target.systemExclusive(MIDIUtils.gs(64, 2, address, Array.of(value))));
     }
     if (voice.patch) {
       const p = voice.patch;
+      const isVoice1 = voice === voices.at(0);
       voice.channel = p.isGMGSDrum ? 9 : 0;
       target.controllerChange(voice.channel, 0, p.bankMSB);
       target.controllerChange(voice.channel, 32, p.bankLSB);
       target.programChange(voice.channel, p.program);
+      target.controllerChange(voice.channel, 7, 127);
+      target.controllerChange(voice.channel, 11, 127);
+      target.controllerChange(voice.channel, 91, isVoice1 ? 8 : 55);
+      target.controllerChange(voice.channel, 93, 0);
+      if (!xg) {
+        target.systemExclusive(MIDIUtils.gs(64, 1, 0x33, Array.of(isVoice1 ? 25 : 64)));
+      }
     }
   }
+
 
   function release(voice) {
     for (const { note, channel } of voice.notes.values()) voice.synth.noteOff(channel, note);
@@ -216,6 +229,12 @@ export function createVoices(getAudio, getMixer, log) {
       if (!voice?.synth || !voice.patch) return;
       const pitch = note + voice.octave * 12 + voice.transpose;
       if (pitch >= 0 && pitch <= 127) voice.synth.noteOff(voice.channel, pitch);
-    }
+    },
+	setVoiceReverb(index, amount) {
+	const voice = voices.at(index);
+	if (!voice?.synth) return;
+		voice.synth.controllerChange(voice.channel, 91, Math.max(0, Math.min(127, amount)));
+	}
+	
   };
 }

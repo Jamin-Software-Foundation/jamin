@@ -166,6 +166,13 @@ export class CRKDStrummerEngine {
     }
     this.emitState();
   }
+  
+  syncModeReverb() {
+    if (!this.voice?.voices?.setVoiceReverb) return;
+    const isDryRhythm = this.playMode === 'STRUMSEQ' || this.playMode === 'BOOM_CHICK';
+    this.voice.voices.setVoiceReverb(0, isDryRhythm ? 8 : 38);
+  }
+  
 
   executeWhammyCommand(mask) {
     const toggleTrack = (t) => { this.trackMutes[t] = !this.trackMutes[t]; this.onTrackMute(t, this.trackMutes[t]); };
@@ -192,6 +199,7 @@ export class CRKDStrummerEngine {
       case 19: this.voice.setVoiceMute('pad', !this.voice.mutes.pad); break;
       case 31: this.stop(); this.autoHold = false; this.pendingChordMask = 0; this.committedChordMask = 0; this.clock.barStartTimeSec = null; break;
     }
+    this.syncModeReverb();	
     this.syncClock();
     this.emitState();
   }

@@ -59,19 +59,46 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
 
   function startChannels() {
     const audio = getAudio(), rate = getRate();
-    const keyIdx = (noteNames.indexOf(keyInput.value) - parseInt(tempoInput.value, 10) + 12) % 12;
-    const key = noteNames[keyIdx], startTime = audio.currentTime + 0.03;
-    barDuration = 4 * (60 / tempo) / rate; barStartTime = startTime;
-    currentVariation = -1; altVariation = false; currentDrumKey = intros[introEnding]; endingScheduled = false;
-
-    if (loopAudioBuffers.drums[currentDrumKey]) activeSources.push(triggerLoopNode('drums', loopAudioBuffers.drums[currentDrumKey], rate, startTime, 0.1));
-    if (loopAudioBuffers.bass[`0_BIN_MAJ_${key}`]) activeSources.push(triggerLoopNode('bass', loopAudioBuffers.bass[`0_BIN_MAJ_${key}`], rate, startTime, 0.1));
-    if (loopAudioBuffers.chords[`0_IN_MAJ_${key}`]) activeSources.push(triggerLoopNode('chords', loopAudioBuffers.chords[`0_IN_MAJ_${key}`], rate, startTime, 0.1));
-
     const bpm = Math.ceil(tempo * rate);
-    beatCounter?.setBpm(bpm); beatCounter?.start(startTime);
-    strummer.clock.bpm = bpm; strummer.syncBarStart(startTime);
+    const keyIdx = (noteNames.indexOf(keyInput.value) - parseInt(tempoInput.value, 10) + 12) % 12;
+    const key = noteNames[keyIdx];
+    const now = audio.currentTime;
+
+    barDuration = 4 * (60 / tempo) / rate;
+    let startTime = now + 0.03;
+
+    // If the guitar .strumseq loop is already running, snap the audio style's Beat 1
+    // onto the exact next bar downbeat of the running strum clock
+    if (strummer.clock.isRunning && strummer.clock.barStartTimeSec !== null) {
+      strummer.clock.bpm = bpm;
+      const strumBarStart = strummer.clock.barStartTimeSec;
+      const barsElapsed = Math.floor((now + 0.02 - strumBarStart) / barDuration) + 1;
+      startTime = strumBarStart + Math.max(1, barsElapsed) * barDuration;
+    } else {
+      strummer.clock.bpm = bpm;
+      strummer.syncBarStart(startTime);
+    }
+
+    barStartTime = startTime;
+    currentVariation = -1;
+    altVariation = false;
+    currentDrumKey = intros[introEnding];
+    endingScheduled = false;
+
+    if (loopAudioBuffers.drums[currentDrumKey]) {
+      activeSources.push(triggerLoopNode('drums', loopAudioBuffers.drums[currentDrumKey], rate, startTime, 0.1));
+    }
+    if (loopAudioBuffers.bass[`0_BIN_MAJ_${key}`]) {
+      activeSources.push(triggerLoopNode('bass', loopAudioBuffers.bass[`0_BIN_MAJ_${key}`], rate, startTime, 0.1));
+    }
+    if (loopAudioBuffers.chords[`0_IN_MAJ_${key}`]) {
+      activeSources.push(triggerLoopNode('chords', loopAudioBuffers.chords[`0_IN_MAJ_${key}`], rate, startTime, 0.1));
+    }
+
+    beatCounter?.setBpm(bpm);
+    beatCounter?.start(startTime);
   }
+
 
   function stopImmediate() {
     activeSources.forEach(s => { try { s.stop(); } catch {} }); activeSources = [];
@@ -179,7 +206,13 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
 
 
   return {
-    setStyleData(newTempo, buffers) { tempo = newTempo; loopAudioBuffers = buffers; beatCounter = new BeatCounterWidget('#beat-counter-container', getAudio(), { bpm: tempo, beatsPerBar: 4 }); },
+    setStyleData(newTempo, buffers) {
+      tempo = newTempo;
+      loopAudioBuffers = buffers;
+      const effectiveBpm = Math.ceil(tempo * getRate());
+      strummer.clock.bpm = effectiveBpm;
+      beatCounter = new BeatCounterWidget('#beat-counter-container', getAudio(), { bpm: effectiveBpm, beatsPerBar: 4 });
+    },	  
     toggleStartEnd, stopImmediate, changeChord, setVariation,
     restart: () => { stopImmediate(); isPlaying = true; document.querySelector('#btn-play').innerHTML = 'END'; startChannels(); },
     requestVariation: () => { variationRequested = true; },
