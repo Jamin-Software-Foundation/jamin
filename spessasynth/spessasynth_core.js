@@ -1,5 +1,5 @@
 //import { inflateSync } from "fflate";
-import { StbVorbis } from "/spessasynth/stb-vorbis.js";
+import { StbVorbis } from "./stb-vorbis.js";
 // src/utils/byte_functions/big_endian.ts
 /**
 * Reads number as Big endian.
