@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="importmap">
+    {
+        "imports": {
+            "spessasynth_core": "/spessasynth/spessasynth_core.js",
+            "spessasynth_lib": "/spessasynth/spessasynth_lib.js",			
+            "fflate": "/spessasynth/fflate.js",
+            "stb-vorbis": "/spessasynth/stb-vorbis.js"
+        }
+    }
+    </script>	
+  <meta charset="UTF-8" />
+  <title>CRKD Dual-SF2 Live Guitar Strummer PoC</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #121418; color: #e6edf3; padding: 20px; max-width: 960px; margin: auto; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .card { background: #1b1f26; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+    h2 { margin-top: 0; font-size: 1rem; color: #58a6ff; text-transform: uppercase; letter-spacing: 0.05em; }
+    label { display: block; margin-bottom: 8px; font-size: 0.9rem; }
+    button { background: #238636; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #2ea043; }
+    .frets { display: flex; gap: 10px; margin: 12px 0; }
+    .fret { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; opacity: 0.25; border: 2px solid #fff; }
+    .fret.on { opacity: 1; transform: scale(1.08); box-shadow: 0 0 12px currentColor; }
+    .g { background: #2ea043; color: #fff; }
+    .r { background: #da3633; color: #fff; }
+    .y { background: #d29922; color: #000; }
+    .b { background: #1f6feb; color: #fff; }
+    .o { background: #db6d28; color: #fff; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .badge { padding: 4px 10px; border-radius: 4px; background: #21262d; border: 1px solid #30363d; font-size: 0.85rem; }
+    .badge.active { background: #1f6feb; border-color: #58a6ff; }
+    .badge.muted { background: #da3633; border-color: #ff7b72; }
+    .strings { font-family: monospace; font-size: 1.1rem; background: #0d1117; padding: 12px; border-radius: 6px; margin-top: 10px; }
+  </style>  
+</head>
+<body>
+  <h1>🎸 CRKD Live Guitar Strummer PoC (Dual SF2)</h1>
+
+  <div class="grid">
+    <div class="card">
+      <h2>1. Load Dual SF2 Synthesizers</h2>
+      <label>Acoustic Guitar SF2 (e.g., Acoustic Guitars JNv2.4.sf2):
+        <input type="file" id="acousticSf2Input" accept=".sf2" />
+      </label>
+      <label>Electric Guitar SF2:
+        <input type="file" id="electricSf2Input" accept=".sf2" />
+      </label>
+      <label>Optional Ample .strumseq XML:
+        <input type="file" id="strumSeqInput" accept=".strumseq,.xml" />
+      </label>
+      <button id="startAudioBtn">Initialize Audio & CRKD Polling</button>
+    </div>
+
+    <div class="card">
+      <h2>2. Live CRKD Neck & Chord State</h2>
+      <div class="frets">
+        <div class="fret g" id="f0">G</div>
+        <div class="fret r" id="f1">R</div>
+        <div class="fret y" id="f2">Y</div>
+        <div class="fret b" id="f3">B</div>
+        <div class="fret o" id="f4">O</div>
+      </div>
+      <div>Active Chord: <strong id="chordLabel">NONE (Noise Mode)</strong> | Transpose: <strong id="transposeLabel">0</strong></div>
+      <div class="strings" id="stringsDisplay">Strings [E A D G B E]: [ - , - , - , - , - , - ]</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. Whammy + Fret Modal Matrix & Mixer Mutes</h2>
+    <div class="badges" id="modeBadges">
+      <span class="badge" id="modeLabel">Mode: STRUMSEQ</span>
+      <span class="badge" id="autoHoldLabel">Auto-Hold: OFF</span>
+      <span class="badge" id="noiseModeLabel">No-Fret Noise: MUTED_SYNC</span>
+      <span class="badge" id="bpmLabel">BPM: 130 (Step 1)</span>
+    </div>
+    <div class="badges" id="muteBadges">
+      <span class="badge" id="mute-drums">Drums (W+GRY)</span>
+      <span class="badge" id="mute-bass">Bass (W+RYB)</span>
+      <span class="badge" id="mute-chords">Chords (W+YBO)</span>
+      <span class="badge" id="mute-guitar">Guitar SF2 (W+GBO)</span>
+      <span class="badge" id="mute-pad">Pad/Strings SF2 (W+GRO)</span>
+    </div>
+  </div>
+
+  <script type="module">
+	import { WorkletSynthesizer } from "/spessasynth/spessasynth_lib.js";
+    import { CRKDStrummerEngine } from "./crkd-strummer-engine.js";
+	
+	const WORKLET_URL = "/spessasynth/spessasynth_processor.min.js"; // Must match your local spessasynth_lib.js!
+    const NOTE_NAMES = Array.of("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B");
+	
+    let audioCtx = null;
+    let acousticBuffer = null;
+    let electricBuffer = null;
+
+    const engine = new CRKDStrummerEngine({
+      onStateChange: (state) => {
+        for (let i = 0; i < 5; i++) {
+          document.getElementById(`f${i}`).classList.toggle("on", Boolean(state.currentFretMask & (1 << i)));
+        }
+
+        if (state.chordDef && state.voicing) {
+          const [qual, root, bass] = state.chordDef;
+          const rootName = NOTE_NAMES.at((root + state.transpose + 120) % 12);
+          const bassName = NOTE_NAMES.at((bass + state.transpose + 120) % 12);
+          document.getElementById("chordLabel").textContent =
+            root === bass ? `${rootName} ${qual}` : `${rootName} ${qual} / ${bassName}`;
+
+          const strNames = state.voicing.strings.map(m =>
+            m === null ? "X" : `${NOTE_NAMES.at(m % 12)}${Math.floor(m / 12) - 1}`
+          );
+          document.getElementById("stringsDisplay").textContent = `Strings [E A D G B E]: [ ${strNames.join(" , ")} ]`;
+        } else {
+          document.getElementById("chordLabel").textContent = "NONE (Guitar Noise)";
+          document.getElementById("stringsDisplay").textContent = "Strings [E A D G B E]: [ - , - , - , - , - , - ]";
+        }
+
+        document.getElementById("transposeLabel").textContent = state.transpose;
+        document.getElementById("modeLabel").textContent = `Mode: ${state.playMode}`;
+
+        const ahEl = document.getElementById("autoHoldLabel");
+        ahEl.textContent = `Auto-Hold: ${state.autoHold ? "ON" : "OFF"}`;
+        ahEl.classList.toggle("active", state.autoHold);
+
+        document.getElementById("noiseModeLabel").textContent = `No-Fret Noise: ${state.noiseMode}`;
+        document.getElementById("bpmLabel").textContent = `BPM: ${state.bpm} (Step ${state.seqStep})`;
+
+        Object.entries(state.mutes).forEach(([track, isMuted]) => {
+          document.getElementById(`mute-${track}`)?.classList.toggle("muted", isMuted);
+        });
+      }
+    });
+
+    document.getElementById("acousticSf2Input").addEventListener("change", async (e) => {
+      if (e.target.files.length) acousticBuffer = await e.target.files.item(0).arrayBuffer();
+    });
+
+    document.getElementById("electricSf2Input").addEventListener("change", async (e) => {
+      if (e.target.files.length) electricBuffer = await e.target.files.item(0).arrayBuffer();
+    });
+
+    document.getElementById("strumSeqInput").addEventListener("change", async (e) => {
+      if (e.target.files.length) {
+        const xmlText = await e.target.files.item(0).text();
+        engine.loadStrumSeqXML(xmlText);
+      }
+    });
+
+    async function createSynthInstance(ctx, sf2Buffer) {
+      if (!sf2Buffer) return null;
+      const synth = new WorkletSynthesizer(ctx);
+      synth.connect(ctx.destination);
+      await synth.soundBankManager.addSoundBank(sf2Buffer.slice(0), "main");
+      await synth.isReady;
+      return synth;
+    }
+
+    document.getElementById("startAudioBtn").addEventListener("click", async () => {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+        await audioCtx.audioWorklet.addModule(WORKLET_URL);
+      }
+      await audioCtx.resume();
+
+      const acousticSynth = await createSynthInstance(audioCtx, acousticBuffer);
+      const electricSynth = await createSynthInstance(audioCtx, electricBuffer);
+
+      engine.setSynths(acousticSynth, electricSynth);
+      engine.start();
+      document.getElementById("startAudioBtn").textContent = "Engine Running (Press CRKD Frets/Strum)";
+    });
+  </script>
+
+</body>
+</html>

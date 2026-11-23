@@ -18,7 +18,20 @@
 				<div id="beat-counter-container"></div>				
 			</section>
             <section class="panel-body browser-area" id="browser-area"><div class="browser-title" id="browser-title"></div>
-                <div class="style-list" id="style-browser"></div><div class="patch-list" id="voice1-browser" hidden></div><div class="patch-list" id="voice2-browser" hidden></div><div id="style-inspect"></div></section>
+				<div class="style-list" id="style-browser"></div>
+				<div id="voice1-split" style="display:flex; flex-direction:column; gap:10px; height:100%;" hidden>
+				  <div style="flex:1; min-height:0; max-height: 200px;overflow:auto;">
+					<div style="font-size:0.75rem; opacity:0.75; margin-bottom:4px;">VOICE 1 PATCHES</div>
+					<div class="patch-list" id="voice1-browser"></div>
+				  </div>
+				  <div style="flex:1; min-height:0; max-height: 200px; overflow:auto; border-top:1px solid rgba(255,255,255,0.15); padding-top:8px;">
+					<div style="font-size:0.75rem; opacity:0.75; margin-bottom:4px;">VOICE 1 STRUM PATTERNS (.STRUMSEQ)</div>
+					<div class="patch-list" id="strumseq-browser"></div>
+				  </div>
+				</div>
+				<div class="patch-list" id="voice2-browser" hidden></div>
+				<div id="style-inspect"></div>
+			</section>
             <section class="panel-body side-right voice-settings"><div class="voice-tools"><button id="select-voice1" class="selected">Voice 1</button><button id="select-voice2">Voice 2</button></div>
                 <div id="voice-controls"></div><div id="effect-controls"></div></section>
             <section class="mixer" id="console-mixer"><span class="mixer-title">MIXER</span></section>
@@ -45,9 +58,26 @@
     move('txt-dir', 'global-status');
     move('midi-status', 'global-status');
     move('guitar-status', 'global-status');
+	
+    const guitarHud = document.createElement('div');
+    guitarHud.id = 'guitar-hud';
+    guitarHud.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; font-size:0.78rem; font-family:monospace;';
+    guitarHud.innerHTML = `
+      <span id="hud-mode" style="padding:2px 6px; border-radius:4px; background:#2ea043; color:#fff; font-weight:bold;">STRUMSEQ</span>
+      <span id="hud-hold" style="padding:2px 6px; border-radius:4px; background:#313244; color:#a6adc8;">HOLD: OFF</span>
+      <span id="hud-noise" style="padding:2px 6px; border-radius:4px; background:#313244; color:#a6adc8;">NOISE: SYNC</span>
+      <span id="hud-chord" style="padding:2px 6px; border-radius:4px; background:#1e1e2e; color:#89b4fa;">CHORD: --</span>
+    `;
+    old('global-status').appendChild(guitarHud);
+	
     move('sf2-scan-status', 'global-status');
     move('status', 'global-status');
-
+	
+	const strumSeqStatus = document.createElement('div');
+	strumSeqStatus.id = 'strumseq-status';
+	strumSeqStatus.textContent = 'StrumSeq: Default Pop';
+	old('global-status').appendChild(strumSeqStatus);
+	
     old('style-browser').appendChild(old('kst-items'));
     old('file-display').remove();
     move('btn-parse', 'style-inspect');
@@ -88,10 +118,14 @@
         add('◄ ' + open.name.replace('USER_STYLE/', ''), 'back', () => { state.open = null; window.renderTwoLevel(container, state, groups, emptyText); });
         for (const item of open.items) add(item.label, item.selected ? 'selected' : '', item.onClick, item.title);
     };
-    const browserViews = { style: 'style-browser', voice1: 'voice1-browser', voice2: 'voice2-browser' };
+
+	const browserViews = { style: 'style-browser', voice1: 'voice1-split', voice2: 'voice2-browser' };	
     const browserTitles = { style: 'Styles', voice1: 'Voice 1', voice2: 'Voice 2' };
     window.showBrowser = view => {
-        for (const [name, id] of Object.entries(browserViews)) old(id).hidden = name !== view;
+        for (const [name, id] of Object.entries(browserViews)) {
+			old(id).hidden = name !== view;
+			old(id).style.display = name === view ? (id === 'voice1-split' ? 'flex' : '') : 'none';			
+		}
         old('browser-title').textContent = browserTitles[view];
         document.querySelectorAll('.browse-head').forEach(head => head.classList.toggle('browsing', head.dataset.browse === view));
         if (view !== 'style') old(`select-${view}`).click();

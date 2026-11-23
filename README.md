@@ -1,8 +1,8 @@
 # Jamin
 
-A browser-based audio-loop arranger
+A browser-based audio-loop arranger with a live dual-voice SoundFont strummer and arpeggiator engine.
 
-## Guitar gamepad
+## Guitar gamepad & live strummer
 
 Connect the CRKD multi-platform Les Paul USB receiver, select PC and guitar
 default mode (not KEYJAM or Festival), then press **Enable guitar**. Press a
@@ -11,14 +11,16 @@ gamepad is used until disconnected; disable other gamepads to avoid selecting
 the wrong device. Browser/OS support for the Gamepad API and its standard
 mapping is required.
 
-Strum up or down while holding a supported fret combination to select a chord,
-relative to the arranger key. No fret or an unlisted combination does nothing.
-The CRKD logo starts/stops the arranger. Hold Starpower with green, red, yellow
-or blue for ARR A, B, C or D; orange advances, as does releasing Starpower
-without a fret. Starpower combinations do not strum chords. The headstock
-D-pad left/right transposes the arranger and both voices down/up one semitone;
-the change is blocked if either voice would exceed its -12 to +12 range.
-Some browsers or operating systems may reserve the logo button.
+### Playing chords, strums & dual voices
+Pressing fret combinations stages the next chord relative to the arranger key;
+flicking the **strum bar up or down** commits the chord change and plays both
+SoundFont voices:
+* **Voice 1 (Primary Guitar):** Plays 6-string strummed chords, `.strumseq`
+  rhythmic patterns, alternating root/5th basslines, fingerstyle arpeggios, or
+  no-fret percussive guitar noises.
+* **Voice 2 (Sustaining Pad / Strings):** Plays smooth, legato block chords
+  underneath Voice 1 and sustains across rhythms until a new chord is strummed
+  or the Whammy bar is pressed alone (`Whammy` + no frets) to cut it off.
 
 | Chord | Frets | Chord | Frets |
 | --- | --- | --- | --- |
@@ -33,16 +35,57 @@ Some browsers or operating systems may reserve the logo button.
 | 5/7 | Green + Red | 5b | Green + Red + Yellow |
 | 6 | Red + Yellow + Blue | 7b | Red + Yellow |
 
-Guitar input controls the arranger directly; it does not send MIDI to external
-devices or play the SoundFont voices. The profile in `guitar-gamepad.js` can be
-extended for other controllers with different button layouts.
+### Arranger, variation & fill/break controls
+* **CRKD Logo (Button 16):** Starts the arranger, schedules the bar-quantized
+  ending when pressed with no frets, or stops immediately when pressed while
+  holding any fret.
+* **Starpower (Button 14):**
+  * **No frets:** Advances to the next variation (with Auto-Fill if enabled).
+  * **Orange:** Steps back to the previous variation.
+  * **Green / Red / Yellow / Blue:** Jumps directly to **Variations 1–4** (`ARRA`–`ARRD`).
+  * **G+R / R+Y / Y+B / B+O:** Jumps directly to **Variations 5–8** (`ARRA_1`–`ARRD_1`).
+* **Start (Button 11):** Plays a bar-quantized **Drum Break** (`BRKA`–`BRKD`)
+  when pressed with no frets, or triggers **Drum Fills 1–4** (`FILA`–`FILD`)
+  when held with **Green**, **Red**, **Yellow**, or **Blue**.
+* **Button 8 + Frets (Masks 1–20):** Recalls saved **Registrations 1–20**
+  (restoring style, tempo, key, mixer levels, SoundFont voices, and active
+  `.strumseq` / guitar mode settings).
+* **Headstock D-pad Left / Right (Buttons 10 / 15):** Transposes the arranger
+  key and both SoundFont voices down or up one semitone (blocked if either voice
+  would exceed its -12 to +12 range).
+
+### Whammy modal matrix (strumming, arpeggios & mutes)
+Holding the **Whammy bar (Button 6)** turns the fret buttons into a modal
+command selector (triggered on Whammy release):
+
+| Whammy + Frets | Action |
+| --- | --- |
+| *(No frets)* | Cutoff / choke sustained **Voice 2** pad chord |
+| **Green** | **StrumSeq mode** (manual down/up strums, or bar-synced `.strumseq` loop when Auto-Hold is ON) |
+| **Red** | **Boom-Chick mode** (alternating root/5th bass on strum down, treble strum on strum up) |
+| **Yellow / Blue / Orange** | **Arpeggio modes 1–3** (root bass on strum down, sequence step on strum up; open chord strum when no frets are held) |
+| **Green + Red** | Toggle **Auto-Hold** ON/OFF (latches chords and runs `.strumseq` clock) |
+| **Red + Yellow + Strum Down** | **Tap Tempo** for the `.strumseq` clock |
+| **Yellow + Blue** | Toggle no-fret guitar noise between **tempo-synced muted rakes** and **MIDI FX notes** |
+| **Blue + Orange** | Toggle **Voice 2 (Pad)** mute ON/OFF |
+| **G + R + Y** | Mute / unmute **Drums** |
+| **R + Y + B** | Mute / unmute **Bass** |
+| **Y + B + O** | Mute / unmute **Backing Chords** |
+| **G + B + O** | Mute / unmute **Voice 1 (Guitar)** |
+| **G + R + O** | Mute / unmute **Voice 2 (Pad)** |
+| **All 5 Frets** | **Panic / Stop** (silences all guitar strings, pad notes, and Auto-Hold) |
+
+The profile in `crkd-gamepad.js` can be extended for other controllers with
+different button layouts.
 
 ## Importing assets
 
 Use **Import** in Global to select a ZIP containing any of `USER_STYLE`,
-`USER_MODELING`, and `VOICES` (optionally inside a parent folder). Styles are
-`.KST` files; modeling folders contain audio loops; voices can be `.sf2` files
-or folders of consecutive `part_00`, `part_01`, ... SoundFont chunks.
+`USER_MODELING`, `VOICES`, and `STRUMSEQ` (optionally inside a parent folder).
+Styles are `.KST` files; modeling folders contain audio loops; voices can be
+`.sf2` files or folders of consecutive `part_00`, `part_01`, ... SoundFont chunks;
+and `STRUMSEQ` folders contain Ample Sound `.strumseq` XML pattern files (which
+can also be browsed in the lower half of the **Voice 1** panel).
 
 Imports are stored per file in the browser's `jamin` IndexedDB and are merged
 with the read-only assets when **ON** is pressed. Importing while ON refreshes

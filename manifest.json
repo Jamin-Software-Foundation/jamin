@@ -4,6 +4,193 @@
   "type": "directory",
   "children": [
     {
+      "name": "STRUMSEQ",
+      "path": "assets/STRUMSEQ",
+      "type": "directory",
+      "children": [
+        {
+          "name": "Default",
+          "path": "assets/STRUMSEQ/Default",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Default1.strumseq": {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            "Default2.strumseq": {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            "Default3.strumseq": {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            "Default4.strumseq": {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            "Default5.strumseq": {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            "Default6.strumseq": {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            "Default7.strumseq": {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            "Default8.strumseq": {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        }
+      ],
+      "list": {
+        "Default": {
+          "name": "Default",
+          "path": "assets/STRUMSEQ/Default",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Default1.strumseq": {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            "Default2.strumseq": {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            "Default3.strumseq": {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            "Default4.strumseq": {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            "Default5.strumseq": {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            "Default6.strumseq": {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            "Default7.strumseq": {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            "Default8.strumseq": {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
+    {
       "name": "USER_MODELING",
       "path": "assets/USER_MODELING",
       "type": "directory",
@@ -5256,13 +5443,6 @@
       "type": "directory",
       "children": [
         {
-          "name": "Ballad",
-          "path": "assets/USER_STYLE/Ballad",
-          "type": "directory",
-          "children": [],
-          "list": {}
-        },
-        {
           "name": "Pop",
           "path": "assets/USER_STYLE/Pop",
           "type": "directory",
@@ -5280,23 +5460,9 @@
               "type": "file"
             }
           }
-        },
-        {
-          "name": "Songs",
-          "path": "assets/USER_STYLE/Songs",
-          "type": "directory",
-          "children": [],
-          "list": {}
         }
       ],
       "list": {
-        "Ballad": {
-          "name": "Ballad",
-          "path": "assets/USER_STYLE/Ballad",
-          "type": "directory",
-          "children": [],
-          "list": {}
-        },
         "Pop": {
           "name": "Pop",
           "path": "assets/USER_STYLE/Pop",
@@ -5315,13 +5481,6 @@
               "type": "file"
             }
           }
-        },
-        "Songs": {
-          "name": "Songs",
-          "path": "assets/USER_STYLE/Songs",
-          "type": "directory",
-          "children": [],
-          "list": {}
         }
       }
     },
@@ -5330,6 +5489,35 @@
       "path": "assets/VOICES",
       "type": "directory",
       "children": [
+        {
+          "name": "Acoustic_Guitars_JNv2_4",
+          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          }
+        },
         {
           "name": "Acoustic_Keys_Intimate",
           "path": "assets/VOICES/Acoustic_Keys_Intimate",
@@ -5420,6 +5608,35 @@
         }
       ],
       "list": {
+        "Acoustic_Guitars_JNv2_4": {
+          "name": "Acoustic_Guitars_JNv2_4",
+          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          }
+        },
         "Acoustic_Keys_Intimate": {
           "name": "Acoustic_Keys_Intimate",
           "path": "assets/VOICES/Acoustic_Keys_Intimate",
@@ -5512,6 +5729,193 @@
     }
   ],
   "list": {
+    "STRUMSEQ": {
+      "name": "STRUMSEQ",
+      "path": "assets/STRUMSEQ",
+      "type": "directory",
+      "children": [
+        {
+          "name": "Default",
+          "path": "assets/STRUMSEQ/Default",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Default1.strumseq": {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            "Default2.strumseq": {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            "Default3.strumseq": {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            "Default4.strumseq": {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            "Default5.strumseq": {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            "Default6.strumseq": {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            "Default7.strumseq": {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            "Default8.strumseq": {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        }
+      ],
+      "list": {
+        "Default": {
+          "name": "Default",
+          "path": "assets/STRUMSEQ/Default",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Default1.strumseq": {
+              "name": "Default1.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default1.strumseq",
+              "type": "file"
+            },
+            "Default2.strumseq": {
+              "name": "Default2.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default2.strumseq",
+              "type": "file"
+            },
+            "Default3.strumseq": {
+              "name": "Default3.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default3.strumseq",
+              "type": "file"
+            },
+            "Default4.strumseq": {
+              "name": "Default4.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default4.strumseq",
+              "type": "file"
+            },
+            "Default5.strumseq": {
+              "name": "Default5.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default5.strumseq",
+              "type": "file"
+            },
+            "Default6.strumseq": {
+              "name": "Default6.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default6.strumseq",
+              "type": "file"
+            },
+            "Default7.strumseq": {
+              "name": "Default7.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default7.strumseq",
+              "type": "file"
+            },
+            "Default8.strumseq": {
+              "name": "Default8.strumseq",
+              "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        }
+      }
+    },
     "USER_MODELING": {
       "name": "USER_MODELING",
       "path": "assets/USER_MODELING",
@@ -10765,13 +11169,6 @@
       "type": "directory",
       "children": [
         {
-          "name": "Ballad",
-          "path": "assets/USER_STYLE/Ballad",
-          "type": "directory",
-          "children": [],
-          "list": {}
-        },
-        {
           "name": "Pop",
           "path": "assets/USER_STYLE/Pop",
           "type": "directory",
@@ -10789,23 +11186,9 @@
               "type": "file"
             }
           }
-        },
-        {
-          "name": "Songs",
-          "path": "assets/USER_STYLE/Songs",
-          "type": "directory",
-          "children": [],
-          "list": {}
         }
       ],
       "list": {
-        "Ballad": {
-          "name": "Ballad",
-          "path": "assets/USER_STYLE/Ballad",
-          "type": "directory",
-          "children": [],
-          "list": {}
-        },
         "Pop": {
           "name": "Pop",
           "path": "assets/USER_STYLE/Pop",
@@ -10824,13 +11207,6 @@
               "type": "file"
             }
           }
-        },
-        "Songs": {
-          "name": "Songs",
-          "path": "assets/USER_STYLE/Songs",
-          "type": "directory",
-          "children": [],
-          "list": {}
         }
       }
     },
@@ -10839,6 +11215,35 @@
       "path": "assets/VOICES",
       "type": "directory",
       "children": [
+        {
+          "name": "Acoustic_Guitars_JNv2_4",
+          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          }
+        },
         {
           "name": "Acoustic_Keys_Intimate",
           "path": "assets/VOICES/Acoustic_Keys_Intimate",
@@ -10929,6 +11334,35 @@
         }
       ],
       "list": {
+        "Acoustic_Guitars_JNv2_4": {
+          "name": "Acoustic_Guitars_JNv2_4",
+          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "type": "file"
+            }
+          }
+        },
         "Acoustic_Keys_Intimate": {
           "name": "Acoustic_Keys_Intimate",
           "path": "assets/VOICES/Acoustic_Keys_Intimate",
