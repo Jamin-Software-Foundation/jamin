@@ -13,14 +13,20 @@ mapping is required.
 
 ### Playing chords, strums & dual voices
 Pressing fret combinations stages the next chord relative to the arranger key;
-flicking the **strum bar up or down** commits the chord change and plays both
-SoundFont voices:
+flicking or holding the **strum bar up or down** commits the chord change and
+plays both SoundFont voices:
 * **Voice 1 (Primary Guitar):** Plays 6-string strummed chords, `.strumseq`
   rhythmic patterns, alternating root/5th basslines, fingerstyle arpeggios, or
-  no-fret percussive guitar noises.
+  no-fret percussive guitar noises. Automatically switches to a tight, dry
+  mix during strumming and Boom-Chick modes and opens into subtle room ambience
+  during fingerstyle arpeggios.
 * **Voice 2 (Sustaining Pad / Strings):** Plays smooth, legato block chords
   underneath Voice 1 and sustains across rhythms until a new chord is strummed
   or the Whammy bar is pressed alone (`Whammy` + no frets) to cut it off.
+* **Tempo & Bar-Phase Sync:** Selecting a `.KST` style immediately locks the
+  guitar strummer to the style's BPM (including Tempo Shift). Starting a
+  `.strumseq` groove first allows the arranger band to drop in cleanly on the
+  next bar downbeat when started.
 
 | Chord | Frets | Chord | Frets |
 | --- | --- | --- | --- |
@@ -36,9 +42,10 @@ SoundFont voices:
 | 6 | Red + Yellow + Blue | 7b | Red + Yellow |
 
 ### Arranger, variation & fill/break controls
-* **CRKD Logo (Button 16):** Starts the arranger, schedules the bar-quantized
-  ending when pressed with no frets, or stops immediately when pressed while
-  holding any fret.
+* **CRKD Logo (Button 16):** Starts the arranger (snapping onto Beat 1 of an
+  active `.strumseq` loop if strumming started first), schedules the
+  bar-quantized ending when pressed with no frets, or stops immediately when
+  pressed while holding any fret.
 * **Starpower (Button 14):**
   * **No frets:** Advances to the next variation (with Auto-Fill if enabled).
   * **Orange:** Steps back to the previous variation.
@@ -61,10 +68,11 @@ command selector (triggered on Whammy release):
 | Whammy + Frets | Action |
 | --- | --- |
 | *(No frets)* | Cutoff / choke sustained **Voice 2** pad chord |
-| **Green** | **StrumSeq mode** (manual down/up strums, or bar-synced `.strumseq` loop when Auto-Hold is ON) |
+| **Green** | **StrumSeq mode** (enables Auto-Strum and plays `.strumseq` patterns) |
 | **Red** | **Boom-Chick mode** (alternating root/5th bass on strum down, treble strum on strum up) |
 | **Yellow / Blue / Orange** | **Arpeggio modes 1–3** (root bass on strum down, sequence step on strum up; open chord strum when no frets are held) |
-| **Green + Red** | Toggle **Auto-Hold** ON/OFF (latches chords and runs `.strumseq` clock) |
+| **Green + Red** | Toggle **Auto-Hold** ON/OFF (latches `.strumseq` loop continuously across chord changes) |
+| **Green + Yellow** | Toggle **Auto-Strum** ON/OFF (when Auto-Strum is ON and Auto-Hold is OFF, `.strumseq` plays while the strum bar is held up or down and stops when returned to neutral; when Auto-Strum is OFF, strum bar plays manual down/up strums only) |
 | **Red + Yellow + Strum Down** | **Tap Tempo** for the `.strumseq` clock |
 | **Yellow + Blue** | Toggle no-fret guitar noise between **tempo-synced muted rakes** and **MIDI FX notes** |
 | **Blue + Orange** | Toggle **Voice 2 (Pad)** mute ON/OFF |

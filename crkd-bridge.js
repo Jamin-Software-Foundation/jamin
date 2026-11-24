@@ -67,6 +67,14 @@ export function createCrkdBridge({ getAudio, voices, arranger, mixerState, mixer
       const noiseEl = document.getElementById('hud-noise');
       const chordEl = document.getElementById('hud-chord');
       if (!modeEl) return;
+	  
+      const autoStrumEl = document.getElementById('hud-autostrum');
+      if (autoStrumEl) {
+        autoStrumEl.textContent = `STRUM: ${state.autoStrum ? 'AUTO' : 'MAN'}`;
+        autoStrumEl.style.background = state.autoStrum ? '#2ea043' : '#313244';
+        autoStrumEl.style.color = state.autoStrum ? '#fff' : '#a6adc8';
+      }
+	  
 
       const theme = MODE_COLORS[state.playMode] || MODE_COLORS.STRUMSEQ;
       modeEl.textContent = theme.label;

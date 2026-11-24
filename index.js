@@ -127,15 +127,38 @@ initMidiAndKeyboard({ getAudio, voices, mixer: () => mixer, mixerState, logger, 
 
 regs = createRegistrationManager({
   voices, mixerState, mixerUpdaters, logger,
-  getState: () => ({ selectedStyleInfo, key: keyInput.value, tempoShift: Number(tempoInput.value), ...arranger.getState(), guitar: { strumSeqPath: strumSeqBrowser.getSelectedPath(), playMode: strummer.playMode, autoHold: strummer.autoHold, noiseMode: strummer.voice.noiseMode } }),
+  getState: () => ({
+    selectedStyleInfo,
+    key: keyInput.value,
+    tempoShift: Number(tempoInput.value),
+    ...arranger.getState(),
+    guitar: {
+      strumSeqPath: strumSeqBrowser.getSelectedPath(),
+      playMode: strummer.playMode,
+      autoStrum: strummer.autoStrum,
+      autoHold: strummer.autoHold,
+      noiseMode: strummer.voice.noiseMode
+    }
+  }),
   applyState: async (reg, n, missing) => {
     if (noteNames.includes(reg.performance.key)) keyInput.value = reg.performance.key;
-    tempoInput.value = reg.performance.tempoShift || 0; arranger.applyState(reg.performance);
-    if (reg.style) { const entry = styleGroups.get(reg.style.path)?.find(c => c.name === reg.style.name); if (entry && selectedStyleInfo?.handle !== entry) await selectStyle(entry, reg.style.path); }
+    tempoInput.value = reg.performance.tempoShift || 0;
+    arranger.applyState(reg.performance);
+    if (reg.style) {
+      const entry = styleGroups.get(reg.style.path)?.find(c => c.name === reg.style.name);
+      if (entry && selectedStyleInfo?.handle !== entry) await selectStyle(entry, reg.style.path);
+    }
     if (reg.guitar) {
-      strummer.playMode = reg.guitar.playMode || 'STRUMSEQ'; strummer.autoHold = Boolean(reg.guitar.autoHold); strummer.voice.noiseMode = reg.guitar.noiseMode || 'MUTED_SYNC';
-      if (reg.guitar.strumSeqPath && !strumSeqBrowser.selectByPath(reg.guitar.strumSeqPath)) missing.push(`StrumSeq: ${reg.guitar.strumSeqPath}`);
-      strummer.syncModeReverb?.(); strummer.syncClock(); strummer.emitState();
+      strummer.playMode = reg.guitar.playMode || 'STRUMSEQ';
+      strummer.autoStrum = reg.guitar.autoStrum !== undefined ? Boolean(reg.guitar.autoStrum) : true;
+      strummer.autoHold = Boolean(reg.guitar.autoHold);
+      strummer.voice.noiseMode = reg.guitar.noiseMode || 'MUTED_SYNC';
+      if (reg.guitar.strumSeqPath && !strumSeqBrowser.selectByPath(reg.guitar.strumSeqPath)) {
+        missing.push(`StrumSeq: ${reg.guitar.strumSeqPath}`);
+      }
+      strummer.syncModeReverb?.();
+      strummer.syncClock();
+      strummer.emitState();
     }
     logger(`Registration ${n} recalled.${missing.length ? ` Missing: ${missing.join(', ')}` : ''}`);
   }

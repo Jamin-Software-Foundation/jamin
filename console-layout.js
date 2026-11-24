@@ -64,10 +64,12 @@
     guitarHud.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; font-size:0.78rem; font-family:monospace;';
     guitarHud.innerHTML = `
       <span id="hud-mode" style="padding:2px 6px; border-radius:4px; background:#2ea043; color:#fff; font-weight:bold;">STRUMSEQ</span>
+      <span id="hud-autostrum" style="padding:2px 6px; border-radius:4px; background:#2ea043; color:#fff;">STRUM: AUTO</span>
       <span id="hud-hold" style="padding:2px 6px; border-radius:4px; background:#313244; color:#a6adc8;">HOLD: OFF</span>
       <span id="hud-noise" style="padding:2px 6px; border-radius:4px; background:#313244; color:#a6adc8;">NOISE: SYNC</span>
       <span id="hud-chord" style="padding:2px 6px; border-radius:4px; background:#1e1e2e; color:#89b4fa;">CHORD: --</span>
     `;
+
     old('global-status').appendChild(guitarHud);
 	
     move('sf2-scan-status', 'global-status');
