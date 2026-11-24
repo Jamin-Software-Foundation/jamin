@@ -47,8 +47,10 @@ const tempoInput = document.getElementById('ctrl-tempo'), keyInput = document.ge
 const bridgeRef = { strummer: null };
 
 const arranger = createArrangerPlayer({
-  getAudio, ensureMixer,
+  getAudio,
+  ensureMixer,
   strummer: {
+    set externalClockLocked(v) { if (bridgeRef.strummer) bridgeRef.strummer.externalClockLocked = v; },
     clock: {
       get isRunning() { return Boolean(bridgeRef.strummer?.clock.isRunning); },
       get barStartTimeSec() { return bridgeRef.strummer?.clock.barStartTimeSec ?? null; },
@@ -59,6 +61,7 @@ const arranger = createArrangerPlayer({
   },
   logger
 });
+
 
 const { strummer, isGuitarEnabled } = createCrkdBridge({ getAudio, voices, arranger, mixerState, mixerUpdaters, getRegs: () => regs, logger });
 bridgeRef.strummer = strummer;

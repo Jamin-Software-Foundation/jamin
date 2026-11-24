@@ -6,14 +6,14 @@ import { StrumClockRunner } from './strum-clock-runner.js';
 
 export class CRKDStrummerEngine {
   constructor(options = {}) {
-	this.onFillBreak = options.onFillBreak || (() => {}); 
     this.onStateChange = options.onStateChange || (() => {});
     this.onTrackMute = options.onTrackMute || (() => {});
     this.onChordCommit = options.onChordCommit || (() => {});
     this.onLogoPress = options.onLogoPress || (() => {});
     this.onStarPress = options.onStarPress || (() => {});
+    this.onFillBreak = options.onFillBreak || (() => {});
+    this.onRecallReg = options.onRecallReg || (() => {});
     this.onTranspose = options.onTranspose || (() => {});
-    this.onRecallReg = options.onRecallReg || (() => {});	
 
     this.voice = new DualGuitarVoice(options.voices || null, (voiceKey, isMuted) => {
       const mixerKey = voiceKey === 'guitar' ? 'voice1' : 'voice2';
@@ -21,7 +21,9 @@ export class CRKDStrummerEngine {
     });
 
     this.playMode = 'STRUMSEQ';
+    this.autoStrum = true;
     this.autoHold = false;
+    this.externalClockLocked = false;
     this.transpose = 0;
     this.trackMutes = { drums: false, bass: false, chords: false };
 
@@ -42,13 +44,20 @@ export class CRKDStrummerEngine {
       onTapTempo: () => { if (this.clock.registerTap()) { this.syncClock(); this.emitState(); } },
       onWhammyCommand: (mask) => this.executeWhammyCommand(mask),
       onFretChange: (mask) => this.handleFretChange(mask),
-      onStrum: (dir) => this.handleStrum(dir)
+      onStrum: (dir) => this.handleStrum(dir),
+      onStrumRelease: () => this.handleStrumRelease()
     });
   }
 
   setAudioContext(ctx) { if (ctx) this.clock.setAudioContext(ctx); }
   syncBarStart(tsSec) { this.clock.syncBarStart(tsSec); }
   stop() { this.clock.stopClock(); this.voice.muteAllStrings(); this.voice.stopPadChord(); }
+
+  syncModeReverb() {
+    if (!this.voice?.voices?.setVoiceReverb) return;
+    const isDryRhythm = this.playMode === 'STRUMSEQ' || this.playMode === 'BOOM_CHICK';
+    this.voice.voices.setVoiceReverb(0, isDryRhythm ? 8 : 38);
+  }
 
   loadStrumSeqXML(xmlText, keepCurrentBpm = false) {
     const prevBpm = this.clock.bpm;
@@ -67,41 +76,48 @@ export class CRKDStrummerEngine {
   }
 
   syncClock() {
-    if (this.playMode === 'STRUMSEQ' && this.autoHold && this.committedChordMask > 0) {
+    if (this.playMode === 'STRUMSEQ' && this.autoStrum && this.autoHold && this.committedChordMask > 0) {
       this.clock.startClock(() => this.getCommittedVoicing());
     } else {
       this.clock.stopClock();
     }
   }
 
+
   handleFretChange(mask) {
     this.currentFretMask = mask;
-    if (mask > 0) this.pendingChordMask = mask;
-    else if (!this.autoHold) this.pendingChordMask = 0;
+    if (mask > 0) {
+      this.pendingChordMask = mask;
+    } else if (!this.autoHold) {
+      this.pendingChordMask = 0;
+    }
     this.emitState();
+  }
+
+  handleStrumRelease() {
+    if (this.playMode === 'STRUMSEQ' && this.autoStrum && !this.autoHold) {
+      this.clock.stopClock();
+      this.emitState();
+    }
   }
 
   handleStrum(direction) {
     const isArpMode = Boolean(ARPEGGIO_SEQUENCES[this.playMode]);
 
-    // 1. When no frets are held (and Auto-Hold is OFF):
-    //    - In Yellow/Blue/Orange Arpeggio modes -> play a full strum of the last chord
-    //    - In STRUMSEQ / BOOM_CHICK modes -> trigger guitar noise
     if (!this.autoHold && this.currentFretMask === 0) {
       if (isArpMode && this.lastValidVoicing) {
+        this.voice.playPadChord(this.lastValidVoicing);
         this.voice.strumChord(this.lastValidVoicing, {
-          direction,
-          velocity: direction === 'down' ? 100 : 88,
-          spreadMs: direction === 'down' ? 36 : 28,
-          subset: direction === 'down' ? 'all' : 'treble'
+          direction, velocity: direction === 'down' ? 100 : 88,
+          spreadMs: direction === 'down' ? 36 : 28, subset: direction === 'down' ? 'all' : 'treble'
         });
       } else {
         this.committedChordMask = 0;
+        this.voice.stopPadChord();
         this.voice.triggerGuitarNoise(direction, this.lastValidVoicing, this.clock.bpm);
       }
       return this.emitState();
     }
-
 
     const targetMask = this.currentFretMask > 0 ? this.currentFretMask : (this.autoHold ? this.pendingChordMask : 0);
     if (!targetMask || !guitarChords[targetMask]) {
@@ -111,7 +127,7 @@ export class CRKDStrummerEngine {
     }
 
     const chordChanged = targetMask !== this.committedChordMask;
-    if (!chordChanged && this.playMode === 'STRUMSEQ' && this.autoHold && this.clock.isRunning) {
+    if (!chordChanged && this.playMode === 'STRUMSEQ' && this.autoStrum && this.autoHold && this.clock.isRunning) {
       return;
     }
 
@@ -124,24 +140,29 @@ export class CRKDStrummerEngine {
     }
 
     const voicing = this.getCommittedVoicing();
-    // Sustain Voice 2 (Pad/Strings) cleanly under the committed chord
     this.voice.playPadChord(voicing);
 
     if (this.playMode === 'STRUMSEQ') {
-      if (this.autoHold) {
-        // Pure .strumseq playback only: start clock if stopped, otherwise let the running
-        // pattern pick up the newly committed chord seamlessly on the next grid step!
-        if (!this.clock.isRunning) {
-          this.syncClock();
+      if (this.autoStrum) {
+        if (this.autoHold) {
+          // Pure .strumseq playback only: start clock if stopped, otherwise let the running
+          // pattern switch to the newly committed chord cleanly on the next XML grid step
+          if (!this.clock.isRunning) {
+            this.syncClock();
+          }
+        } else {
+          // Momentary Gate Mode (AUTOSTRUM ON + AUTOHOLD OFF): runs while strum bar is held up/down
+          if (!this.externalClockLocked) this.clock.syncBarStart(this.clock.nowSec());
+          this.clock.startClock(() => this.getCommittedVoicing());
         }
       } else {
-        // Auto-Hold OFF: manual down/up strums only
+        // AUTOSTRUM OFF: manual down/up strums only
         this.voice.strumChord(voicing, {
           direction, velocity: direction === 'down' ? 105 : 92,
           spreadMs: direction === 'down' ? 36 : 28, subset: direction === 'down' ? 'all' : 'treble'
         });
       }
-    } else if (this.playMode === 'BOOM_CHICK') {
+     } else if (this.playMode === 'BOOM_CHICK') {
       if (direction === 'down') {
         const bass = voicing.bassString;
         const alt = Math.min(5, bass + 1);
@@ -166,19 +187,15 @@ export class CRKDStrummerEngine {
     }
     this.emitState();
   }
-  
-  syncModeReverb() {
-    if (!this.voice?.voices?.setVoiceReverb) return;
-    const isDryRhythm = this.playMode === 'STRUMSEQ' || this.playMode === 'BOOM_CHICK';
-    this.voice.voices.setVoiceReverb(0, isDryRhythm ? 8 : 38);
-  }
-  
 
   executeWhammyCommand(mask) {
     const toggleTrack = (t) => { this.trackMutes[t] = !this.trackMutes[t]; this.onTrackMute(t, this.trackMutes[t]); };
     switch (mask) {
-      case 0:  this.voice.stopPadChord(); break; // Whammy alone -> choke Voice 2 Pad
-      case 1:  this.playMode = 'STRUMSEQ'; break;
+      case 0:  this.voice.stopPadChord(); break;
+      case 1:  // Whammy + Green -> Switch to STRUMSEQ and ensure autoStrum is active
+        this.playMode = 'STRUMSEQ';
+        this.autoStrum = true;
+        break;
       case 2:  this.playMode = 'BOOM_CHICK'; break;
       case 4:  this.playMode = 'ARP_YELLOW'; break;
       case 8:  this.playMode = 'ARP_BLUE'; break;
@@ -190,6 +207,7 @@ export class CRKDStrummerEngine {
           if (!this.committedChordMask) this.committedChordMask = this.currentFretMask;
         }
         break;
+      case 5:  this.autoStrum = !this.autoStrum; break;
       case 12: this.voice.noiseMode = this.voice.noiseMode === 'MUTED_SYNC' ? 'DEDICATED_MIDI' : 'MUTED_SYNC'; break;
       case 24: this.voice.setVoiceMute('pad', !this.voice.mutes.pad); break;
       case 7:  toggleTrack('drums'); break;
@@ -199,7 +217,7 @@ export class CRKDStrummerEngine {
       case 19: this.voice.setVoiceMute('pad', !this.voice.mutes.pad); break;
       case 31: this.stop(); this.autoHold = false; this.pendingChordMask = 0; this.committedChordMask = 0; this.clock.barStartTimeSec = null; break;
     }
-    this.syncModeReverb();	
+    this.syncModeReverb();
     this.syncClock();
     this.emitState();
   }
@@ -208,7 +226,7 @@ export class CRKDStrummerEngine {
     const displayMask = this.committedChordMask || this.pendingChordMask;
     const chordDef = guitarChords[displayMask] || null;
     this.onStateChange({
-      playMode: this.playMode, autoHold: this.autoHold, noiseMode: this.voice.noiseMode,
+      playMode: this.playMode, autoStrum: this.autoStrum, autoHold: this.autoHold, noiseMode: this.voice.noiseMode,
       bpm: this.clock.bpm, transpose: this.transpose, currentFretMask: this.currentFretMask,
       chordDef, voicing: chordDef ? resolveSixStringVoicing(chordDef, this.transpose) : null,
       seqStep: this.clock.seqStep, mutes: { ...this.trackMutes, ...this.voice.mutes }

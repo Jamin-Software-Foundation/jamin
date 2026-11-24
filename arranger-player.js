@@ -79,6 +79,7 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
       strummer.syncBarStart(startTime);
     }
 
+    strummer.externalClockLocked = true;
     barStartTime = startTime;
     currentVariation = -1;
     altVariation = false;
@@ -99,13 +100,17 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
     beatCounter?.start(startTime);
   }
 
-
   function stopImmediate() {
-    activeSources.forEach(s => { try { s.stop(); } catch {} }); activeSources = [];
-    endingScheduled = false; isPlaying = false;
+    activeSources.forEach(s => { try { s.stop(); } catch {} });
+    activeSources = [];
+    endingScheduled = false;
+    isPlaying = false;
     document.querySelector('#btn-play').innerHTML = 'START';
-    beatCounter?.stop(); strummer.stop();
+    beatCounter?.stop();
+    strummer.externalClockLocked = false;
+    strummer.stop();
   }
+
 
   function toggleStartEnd() {
     const audio = getAudio();

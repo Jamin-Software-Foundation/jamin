@@ -12,7 +12,6 @@ export const crkdProfile = {
   transposeUp: 15
 };
 
-
 export class CRKDGamepadController {
   constructor(profile = crkdProfile, handlers = {}) {
     this.profile = profile;
@@ -22,6 +21,7 @@ export class CRKDGamepadController {
     this.whammyHeld = false;
     this.whammyMask = 0;
     this.whammyActionFired = false;
+    this.strumActive = false;
     this.rafId = null;
   }
 
@@ -31,6 +31,7 @@ export class CRKDGamepadController {
     this.whammyHeld = false;
     this.whammyMask = 0;
     this.whammyActionFired = false;
+    this.strumActive = false;
   }
 
   start() {
@@ -58,9 +59,11 @@ export class CRKDGamepadController {
     if (justPressed(this.profile.logo)) this.handlers.onLogoPress?.(fretMask);
     if (justPressed(this.profile.star)) this.handlers.onStarPress?.(fretMask);
     if (justPressed(this.profile.fillBreak)) this.handlers.onFillBreak?.(fretMask);
-    if (justPressed(this.profile.recallReg)) this.handlers.onRecallReg?.(fretMask);	
+    if (justPressed(this.profile.recallReg)) this.handlers.onRecallReg?.(fretMask);
 
     const whammyDown = isDown(this.profile.whammy);
+    const strumUpHeld = isDown(this.profile.strum.at(0));
+    const strumDownHeld = isDown(this.profile.strum.at(1));
     const strumUp = justPressed(this.profile.strum.at(0));
     const strumDown = justPressed(this.profile.strum.at(1));
 
@@ -86,8 +89,18 @@ export class CRKDGamepadController {
         this.currentFretMask = fretMask;
         this.handlers.onFretChange?.(fretMask);
       }
-      if (strumUp) this.handlers.onStrum?.('up');
-      if (strumDown) this.handlers.onStrum?.('down');
+      if (strumUp) {
+        this.strumActive = true;
+        this.handlers.onStrum?.('up');
+      }
+      if (strumDown) {
+        this.strumActive = true;
+        this.handlers.onStrum?.('down');
+      }
+      if (this.strumActive && !strumUpHeld && !strumDownHeld) {
+        this.strumActive = false;
+        this.handlers.onStrumRelease?.();
+      }
     }
 
     this.prevButtons = gp.buttons.map(b => Boolean(b?.pressed));
