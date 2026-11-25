@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pattern Name="Classic Acoustic Rock" Category="Rock" BPM="118" TimeSignature="4/4" Steps="16">
+  <Note Begin="1" End="3" Velocity="116" Note="72"/>
+  <Note Begin="4" End="4" Velocity="86" Note="76"/>
+  <Note Begin="5" End="6" Velocity="114" Note="74"/>
+  <Note Begin="7" End="8" Velocity="90" Note="76"/>
+  <Note Begin="9" End="10" Velocity="76" Note="77"/>
+  <Note Begin="11" End="12" Velocity="94" Note="76"/>
+  <Note Begin="13" End="14" Velocity="118" Note="72"/>
+  <Note Begin="15" End="16" Velocity="92" Note="76"/>
+</Pattern>

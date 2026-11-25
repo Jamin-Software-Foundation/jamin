@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pattern Name="Gentle Arp Roll" Category="Ballad" BPM="76" TimeSignature="4/4" Steps="16">
+  <Note Begin="1" End="4" Velocity="102" Note="81"/>
+  <Note Begin="3" End="6" Velocity="84" Note="83"/>
+  <Note Begin="5" End="8" Velocity="88" Note="84"/>
+  <Note Begin="7" End="10" Velocity="92" Note="85"/>
+  <Note Begin="9" End="12" Velocity="96" Note="86"/>
+  <Note Begin="11" End="14" Velocity="86" Note="85"/>
+  <Note Begin="13" End="16" Velocity="84" Note="84"/>
+  <Note Begin="15" End="16" Velocity="80" Note="83"/>
+</Pattern>

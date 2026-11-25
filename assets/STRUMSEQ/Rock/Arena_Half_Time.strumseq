@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pattern Name="Arena Half Time" Category="Rock" BPM="92" TimeSignature="4/4" Steps="16">
+  <Note Begin="1" End="6" Velocity="118" Note="72"/>
+  <Note Begin="7" End="8" Velocity="92" Note="76"/>
+  <Note Begin="9" End="12" Velocity="116" Note="72"/>
+  <Note Begin="13" End="14" Velocity="104" Note="74"/>
+  <Note Begin="15" End="16" Velocity="98" Note="76"/>
+</Pattern>

@@ -9,6 +9,25 @@
       "type": "directory",
       "children": [
         {
+          "name": "Ballad",
+          "path": "assets/STRUMSEQ/Ballad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Gentle_Arp_Roll.strumseq": {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Default",
           "path": "assets/STRUMSEQ/Default",
           "type": "directory",
@@ -96,9 +115,202 @@
               "type": "file"
             }
           }
+        },
+        {
+          "name": "Folk",
+          "path": "assets/STRUMSEQ/Folk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Drive.strumseq": {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Funk",
+          "path": "assets/STRUMSEQ/Funk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Sixteenth_Chop.strumseq": {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Latin",
+          "path": "assets/STRUMSEQ/Latin",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Bossa_Nova.strumseq": {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Pop",
+          "path": "assets/STRUMSEQ/Pop",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Heartland_Pop.strumseq": {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            "Four_On_The_Floor_Pop.strumseq": {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            "Island_Pop.strumseq": {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            "Modern_Radio_Pop.strumseq": {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Reggae",
+          "path": "assets/STRUMSEQ/Reggae",
+          "type": "directory",
+          "children": [
+            {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "One_Drop_Skank.strumseq": {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Rock",
+          "path": "assets/STRUMSEQ/Rock",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Alt_Rock_Sixteenths.strumseq": {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            "Anthem_Eighths.strumseq": {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            "Arena_Half_Time.strumseq": {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            "Classic_Acoustic_Rock.strumseq": {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          }
         }
       ],
       "list": {
+        "Ballad": {
+          "name": "Ballad",
+          "path": "assets/STRUMSEQ/Ballad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Gentle_Arp_Roll.strumseq": {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
         "Default": {
           "name": "Default",
           "path": "assets/STRUMSEQ/Default",
@@ -184,6 +396,180 @@
             "Default8.strumseq": {
               "name": "Default8.strumseq",
               "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Folk": {
+          "name": "Folk",
+          "path": "assets/STRUMSEQ/Folk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Drive.strumseq": {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Funk": {
+          "name": "Funk",
+          "path": "assets/STRUMSEQ/Funk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Sixteenth_Chop.strumseq": {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Latin": {
+          "name": "Latin",
+          "path": "assets/STRUMSEQ/Latin",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Bossa_Nova.strumseq": {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Pop": {
+          "name": "Pop",
+          "path": "assets/STRUMSEQ/Pop",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Heartland_Pop.strumseq": {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            "Four_On_The_Floor_Pop.strumseq": {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            "Island_Pop.strumseq": {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            "Modern_Radio_Pop.strumseq": {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Reggae": {
+          "name": "Reggae",
+          "path": "assets/STRUMSEQ/Reggae",
+          "type": "directory",
+          "children": [
+            {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "One_Drop_Skank.strumseq": {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Rock": {
+          "name": "Rock",
+          "path": "assets/STRUMSEQ/Rock",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Alt_Rock_Sixteenths.strumseq": {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            "Anthem_Eighths.strumseq": {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            "Arena_Half_Time.strumseq": {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            "Classic_Acoustic_Rock.strumseq": {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
               "type": "file"
             }
           }
@@ -5735,6 +6121,25 @@
       "type": "directory",
       "children": [
         {
+          "name": "Ballad",
+          "path": "assets/STRUMSEQ/Ballad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Gentle_Arp_Roll.strumseq": {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Default",
           "path": "assets/STRUMSEQ/Default",
           "type": "directory",
@@ -5822,9 +6227,202 @@
               "type": "file"
             }
           }
+        },
+        {
+          "name": "Folk",
+          "path": "assets/STRUMSEQ/Folk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Drive.strumseq": {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Funk",
+          "path": "assets/STRUMSEQ/Funk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Sixteenth_Chop.strumseq": {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Latin",
+          "path": "assets/STRUMSEQ/Latin",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Bossa_Nova.strumseq": {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Pop",
+          "path": "assets/STRUMSEQ/Pop",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Heartland_Pop.strumseq": {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            "Four_On_The_Floor_Pop.strumseq": {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            "Island_Pop.strumseq": {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            "Modern_Radio_Pop.strumseq": {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Reggae",
+          "path": "assets/STRUMSEQ/Reggae",
+          "type": "directory",
+          "children": [
+            {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "One_Drop_Skank.strumseq": {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Rock",
+          "path": "assets/STRUMSEQ/Rock",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Alt_Rock_Sixteenths.strumseq": {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            "Anthem_Eighths.strumseq": {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            "Arena_Half_Time.strumseq": {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            "Classic_Acoustic_Rock.strumseq": {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          }
         }
       ],
       "list": {
+        "Ballad": {
+          "name": "Ballad",
+          "path": "assets/STRUMSEQ/Ballad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Gentle_Arp_Roll.strumseq": {
+              "name": "Gentle_Arp_Roll.strumseq",
+              "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
         "Default": {
           "name": "Default",
           "path": "assets/STRUMSEQ/Default",
@@ -5910,6 +6508,180 @@
             "Default8.strumseq": {
               "name": "Default8.strumseq",
               "path": "assets/STRUMSEQ/Default/Default8.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Folk": {
+          "name": "Folk",
+          "path": "assets/STRUMSEQ/Folk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Drive.strumseq": {
+              "name": "Acoustic_Drive.strumseq",
+              "path": "assets/STRUMSEQ/Folk/Acoustic_Drive.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Funk": {
+          "name": "Funk",
+          "path": "assets/STRUMSEQ/Funk",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Sixteenth_Chop.strumseq": {
+              "name": "Sixteenth_Chop.strumseq",
+              "path": "assets/STRUMSEQ/Funk/Sixteenth_Chop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Latin": {
+          "name": "Latin",
+          "path": "assets/STRUMSEQ/Latin",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Bossa_Nova.strumseq": {
+              "name": "Bossa_Nova.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Pop": {
+          "name": "Pop",
+          "path": "assets/STRUMSEQ/Pop",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Acoustic_Heartland_Pop.strumseq": {
+              "name": "Acoustic_Heartland_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Acoustic_Heartland_Pop.strumseq",
+              "type": "file"
+            },
+            "Four_On_The_Floor_Pop.strumseq": {
+              "name": "Four_On_The_Floor_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Four_On_The_Floor_Pop.strumseq",
+              "type": "file"
+            },
+            "Island_Pop.strumseq": {
+              "name": "Island_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Island_Pop.strumseq",
+              "type": "file"
+            },
+            "Modern_Radio_Pop.strumseq": {
+              "name": "Modern_Radio_Pop.strumseq",
+              "path": "assets/STRUMSEQ/Pop/Modern_Radio_Pop.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Reggae": {
+          "name": "Reggae",
+          "path": "assets/STRUMSEQ/Reggae",
+          "type": "directory",
+          "children": [
+            {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "One_Drop_Skank.strumseq": {
+              "name": "One_Drop_Skank.strumseq",
+              "path": "assets/STRUMSEQ/Reggae/One_Drop_Skank.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Rock": {
+          "name": "Rock",
+          "path": "assets/STRUMSEQ/Rock",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Alt_Rock_Sixteenths.strumseq": {
+              "name": "Alt_Rock_Sixteenths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Alt_Rock_Sixteenths.strumseq",
+              "type": "file"
+            },
+            "Anthem_Eighths.strumseq": {
+              "name": "Anthem_Eighths.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Anthem_Eighths.strumseq",
+              "type": "file"
+            },
+            "Arena_Half_Time.strumseq": {
+              "name": "Arena_Half_Time.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Arena_Half_Time.strumseq",
+              "type": "file"
+            },
+            "Classic_Acoustic_Rock.strumseq": {
+              "name": "Classic_Acoustic_Rock.strumseq",
+              "path": "assets/STRUMSEQ/Rock/Classic_Acoustic_Rock.strumseq",
               "type": "file"
             }
           }
