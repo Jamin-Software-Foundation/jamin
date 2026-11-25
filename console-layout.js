@@ -94,6 +94,13 @@
         old('global-actions').appendChild(button);
     }
     for (let i = 1; i <= 20; i++) old('reg-select').add(new Option(`Reg ${i}`, i));
+	
+    const midiSelect = document.createElement('select');
+    midiSelect.id = 'midi-input-select';
+    midiSelect.setAttribute('aria-label', 'MIDI input device');
+    midiSelect.style.cssText = 'width:100%; margin-top:6px;';
+    midiSelect.add(new Option('All MIDI Devices', 'all'));
+    old('global-actions').after(midiSelect);	
 
     // Two-level pick list: groups first, then the items of the opened group.
     window.renderTwoLevel = (container, state, groups, emptyText) => {
