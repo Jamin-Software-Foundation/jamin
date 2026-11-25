@@ -12,10 +12,43 @@ export const guitarChords = {
 };
 
 export const ARPEGGIO_SEQUENCES = {
-  ARP_YELLOW: ['bass', 3, 4, 2, 5, 3],       // Travis / Folk Roll
-  ARP_BLUE:   ['bass', 2, 3, 4, 5, 4, 3, 2], // Ascending Classical Sweep
-  ARP_ORANGE: ['bass', 5, 4, 3, 5, 4]        // Syncopated Pop / Spanish Roll
+  // 8 Folk / Travis & Alternating Bass Rolls (Yellow)
+  ARP_YELLOW: Array.of(
+    Array.of('bass', 3, 4, 2, 5, 3),             // Var 1: Classic Travis Folk Roll
+    Array.of('bass', 2, 3, 4, 3, 2),             // Var 2: Gentle Inside Pendulum
+    Array.of('bass', 3, 2, 4, 3, 5, 3, 4),       // Var 3: Extended Country Roll
+    Array.of('bass', 4, 3, 5, 2, 4, 3, 5),       // Var 4: High-Energy Bluegrass Crosspick
+    Array.of('bass', 2, 4, 3, 5, 2, 4, 3),       // Var 5: Syncopated Singer-Songwriter
+    Array.of('bass', 3, 5, 4, 2, 5, 4, 3),       // Var 6: Reverse Travis Bounce
+    Array.of('bass', 2, 3, 5, 4, 2, 3, 5),       // Var 7: Wide-Interval Folk Harp
+    Array.of('bass', 3, 4, 5, 2, 4, 5, 3)        // Var 8: Finale Driving Travis
+  ),
+
+  // 8 Classical / Ascending & Cascading Sweeps (Blue)
+  ARP_BLUE: Array.of(
+    Array.of('bass', 2, 3, 4, 5, 4, 3, 2),       // Var 1: Standard Pyramid Sweep
+    Array.of('bass', 3, 4, 5, 4, 3),             // Var 2: Tight 6-Eighth Waltz/Ballad
+    Array.of('bass', 2, 3, 4, 3, 4, 5, 4),       // Var 3: Rising Classical Wave
+    Array.of('bass', 5, 4, 3, 2, 3, 4, 5),       // Var 4: Descending Cascade
+    Array.of('bass', 2, 4, 3, 5, 4, 3, 2),       // Var 5: Broken Thirds Sweep
+    Array.of('bass', 3, 2, 4, 3, 5, 4, 5),       // Var 6: Etude Escalation
+    Array.of('bass', 2, 3, 5, 4, 5, 3, 2),       // Var 7: Romantic Nocturne Roll
+    Array.of('bass', 2, 3, 4, 5, 3, 4, 5)        // Var 8: Grand Arpeggio Climax
+  ),
+
+  // 8 Syncopated Pop, Latin & Contemporary Rolls (Orange)
+  ARP_ORANGE: Array.of(
+    Array.of('bass', 5, 4, 3, 5, 4),             // Var 1: Syncopated Pop Hook
+    Array.of('bass', 4, 5, 3, 4, 5),             // Var 2: Inverted Top-String Pulse
+    Array.of('bass', 3, 5, 4, 5, 3, 4),          // Var 3: Bossa / Latin Syncopation
+    Array.of('bass', 5, 3, 4, 5, 2, 4),          // Var 4: Afro-Pop Highlife Pluck
+    Array.of('bass', 4, 3, 5, 4, 2, 5),          // Var 5: Modern Indie-Pop Bounce
+    Array.of('bass', 5, 4, 5, 3, 4, 2),          // Var 6: Cascading Treble Ostinato
+    Array.of('bass', 3, 4, 5, 4, 5, 3),          // Var 7: Synth-Pop Pluck Sequence
+    Array.of('bass', 5, 3, 5, 4, 5, 2)           // Var 8: Climax Polyrhythmic Roll
+  )
 };
+
 
 const OPEN_STRINGS = Array.of(40, 45, 50, 55, 59, 64); // E2, A2, D3, G3, B3, E4
 const CHORD_INTERVALS = {

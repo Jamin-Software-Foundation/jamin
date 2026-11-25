@@ -33,6 +33,7 @@ export class CRKDStrummerEngine {
     this.lastValidVoicing = resolveSixStringVoicing(Object.values(guitarChords).at(0), 0);
     this.boomChickToggle = false;
     this.arpStep = 0;
+	this.currentVariation = 0;	
 
     this.clock = new StrumClockRunner(this.voice, () => this.emitState());
     this.gamepad = new CRKDGamepadController(options.profile || crkdProfile, {
@@ -51,6 +52,8 @@ export class CRKDStrummerEngine {
 
   setAudioContext(ctx) { if (ctx) this.clock.setAudioContext(ctx); }
   syncBarStart(tsSec) { this.clock.syncBarStart(tsSec); }
+  setVariationIndex(varIdx) {this.currentVariation = Math.max(0, Math.min(7, Number(varIdx) || 0)); this.arpStep = 0; this.emitState();}
+  
   stop() { this.clock.stopClock(); this.voice.muteAllStrings(); this.voice.stopPadChord(); }
 
   syncModeReverb() {
@@ -145,24 +148,20 @@ export class CRKDStrummerEngine {
     if (this.playMode === 'STRUMSEQ') {
       if (this.autoStrum) {
         if (this.autoHold) {
-          // Pure .strumseq playback only: start clock if stopped, otherwise let the running
-          // pattern switch to the newly committed chord cleanly on the next XML grid step
           if (!this.clock.isRunning) {
             this.syncClock();
           }
         } else {
-          // Momentary Gate Mode (AUTOSTRUM ON + AUTOHOLD OFF): runs while strum bar is held up/down
           if (!this.externalClockLocked) this.clock.syncBarStart(this.clock.nowSec());
           this.clock.startClock(() => this.getCommittedVoicing());
         }
       } else {
-        // AUTOSTRUM OFF: manual down/up strums only
         this.voice.strumChord(voicing, {
           direction, velocity: direction === 'down' ? 105 : 92,
           spreadMs: direction === 'down' ? 36 : 28, subset: direction === 'down' ? 'all' : 'treble'
         });
       }
-     } else if (this.playMode === 'BOOM_CHICK') {
+    } else if (this.playMode === 'BOOM_CHICK') {
       if (direction === 'down') {
         const bass = voicing.bassString;
         const alt = Math.min(5, bass + 1);
@@ -173,7 +172,8 @@ export class CRKDStrummerEngine {
         this.voice.strumChord(voicing, { direction: 'up', velocity: 88, spreadMs: 30, subset: 'treble' });
       }
     } else if (isArpMode) {
-      const seq = ARPEGGIO_SEQUENCES[this.playMode];
+      const bank = ARPEGGIO_SEQUENCES[this.playMode];
+      const seq = bank.at(this.currentVariation % bank.length);
       if (direction === 'down') {
         this.arpStep = 1 % seq.length;
         this.voice.pluckString(voicing.bassString, voicing.strings.at(voicing.bassString), 100);
@@ -226,6 +226,7 @@ export class CRKDStrummerEngine {
     const displayMask = this.committedChordMask || this.pendingChordMask;
     const chordDef = guitarChords[displayMask] || null;
     this.onStateChange({
+	  arpVariation: (this.currentVariation % 8) + 1,		
       playMode: this.playMode, autoStrum: this.autoStrum, autoHold: this.autoHold, noiseMode: this.voice.noiseMode,
       bpm: this.clock.bpm, transpose: this.transpose, currentFretMask: this.currentFretMask,
       chordDef, voicing: chordDef ? resolveSixStringVoicing(chordDef, this.transpose) : null,

@@ -56,6 +56,7 @@ const arranger = createArrangerPlayer({
       get barStartTimeSec() { return bridgeRef.strummer?.clock.barStartTimeSec ?? null; },
       set bpm(v) { if (bridgeRef.strummer) bridgeRef.strummer.clock.bpm = v; }
     },
+    setVariationIndex: v => bridgeRef.strummer?.setVariationIndex(v),	
     syncBarStart: t => bridgeRef.strummer?.syncBarStart(t),
     stop: () => bridgeRef.strummer?.stop()
   },
@@ -116,9 +117,21 @@ tempoInput.addEventListener('input', e => {
   if (s.isPlaying) arranger.restart();
 });
 
-keyInput.addEventListener('change', () => { 
-	if (arranger.getState().isPlaying) arranger.restart(); 
+function syncKeyToVoices() {
+  const idx = noteNames.indexOf(keyInput.value);
+  if (idx < 0) return;
+  strummer.voice.stopPadChord();
+  strummer.voice.muteAllStrings();
+  const offset = idx > 6 ? idx - 12 : idx;
+  voices.setTransposeBoth?.(offset);
+}
+
+
+keyInput.addEventListener('change', () => {
+  syncKeyToVoices();
+  if (arranger.getState().isPlaying) arranger.restart();
 });
+
 
 window.setVariation = arranger.setVariation; window.setVariationLetter = arranger.setVarLetter; window.toggleAltVariation = arranger.toggleAlt;
 window.playFillX = () => arranger.playFill(Math.max(0, arranger.getState().currentVariation)); window.playBreakX = arranger.playBreak;
@@ -142,8 +155,10 @@ regs = createRegistrationManager({
   }),
   applyState: async (reg, n, missing) => {
     if (noteNames.includes(reg.performance.key)) keyInput.value = reg.performance.key;
+	syncKeyToVoices();
     tempoInput.value = reg.performance.tempoShift || 0;
     arranger.applyState(reg.performance);
+	
     if (reg.style) {
       const entry = styleGroups.get(reg.style.path)?.find(c => c.name === reg.style.name);
       if (entry && selectedStyleInfo?.handle !== entry) await selectStyle(entry, reg.style.path);

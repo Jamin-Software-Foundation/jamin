@@ -182,6 +182,11 @@ export function createVoices(getAudio, getMixer, log) {
       showSettings();
       return true;
     },
+    setTransposeBoth(semitones) {
+      const clamped = Math.max(-12, Math.min(12, semitones));
+      voices.forEach(v => { v.transpose = clamped; });
+      showSettings();
+    },	
     setState(state) {
       const missing = [];
       state.voices.forEach((saved, index) => {

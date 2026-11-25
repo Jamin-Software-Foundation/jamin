@@ -9,6 +9,35 @@
       "type": "directory",
       "children": [
         {
+          "name": "African",
+          "path": "assets/STRUMSEQ/African",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Afro_Beats_Groove.strumseq": {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            "Afro_Highlife_Pick.strumseq": {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Ballad",
           "path": "assets/STRUMSEQ/Ballad",
           "type": "directory",
@@ -23,6 +52,54 @@
             "Gentle_Arp_Roll.strumseq": {
               "name": "Gentle_Arp_Roll.strumseq",
               "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Blues",
+          "path": "assets/STRUMSEQ/Blues",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Slow_12_8_Blues.strumseq": {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            "Texas_Shuffle.strumseq": {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Country",
+          "path": "assets/STRUMSEQ/Country",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Country_Train_Strum.strumseq": {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
               "type": "file"
             }
           }
@@ -163,12 +240,22 @@
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
               "type": "file"
+            },
+            {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
+              "type": "file"
             }
           ],
           "list": {
             "Bossa_Nova.strumseq": {
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            },
+            "Flamenco_Rumba.strumseq": {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
               "type": "file"
             }
           }
@@ -292,6 +379,35 @@
         }
       ],
       "list": {
+        "African": {
+          "name": "African",
+          "path": "assets/STRUMSEQ/African",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Afro_Beats_Groove.strumseq": {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            "Afro_Highlife_Pick.strumseq": {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          }
+        },
         "Ballad": {
           "name": "Ballad",
           "path": "assets/STRUMSEQ/Ballad",
@@ -307,6 +423,54 @@
             "Gentle_Arp_Roll.strumseq": {
               "name": "Gentle_Arp_Roll.strumseq",
               "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Blues": {
+          "name": "Blues",
+          "path": "assets/STRUMSEQ/Blues",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Slow_12_8_Blues.strumseq": {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            "Texas_Shuffle.strumseq": {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Country": {
+          "name": "Country",
+          "path": "assets/STRUMSEQ/Country",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Country_Train_Strum.strumseq": {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
               "type": "file"
             }
           }
@@ -447,12 +611,22 @@
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
               "type": "file"
+            },
+            {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
+              "type": "file"
             }
           ],
           "list": {
             "Bossa_Nova.strumseq": {
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            },
+            "Flamenco_Rumba.strumseq": {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
               "type": "file"
             }
           }
@@ -6121,6 +6295,35 @@
       "type": "directory",
       "children": [
         {
+          "name": "African",
+          "path": "assets/STRUMSEQ/African",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Afro_Beats_Groove.strumseq": {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            "Afro_Highlife_Pick.strumseq": {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Ballad",
           "path": "assets/STRUMSEQ/Ballad",
           "type": "directory",
@@ -6135,6 +6338,54 @@
             "Gentle_Arp_Roll.strumseq": {
               "name": "Gentle_Arp_Roll.strumseq",
               "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Blues",
+          "path": "assets/STRUMSEQ/Blues",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Slow_12_8_Blues.strumseq": {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            "Texas_Shuffle.strumseq": {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Country",
+          "path": "assets/STRUMSEQ/Country",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Country_Train_Strum.strumseq": {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
               "type": "file"
             }
           }
@@ -6275,12 +6526,22 @@
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
               "type": "file"
+            },
+            {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
+              "type": "file"
             }
           ],
           "list": {
             "Bossa_Nova.strumseq": {
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            },
+            "Flamenco_Rumba.strumseq": {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
               "type": "file"
             }
           }
@@ -6404,6 +6665,35 @@
         }
       ],
       "list": {
+        "African": {
+          "name": "African",
+          "path": "assets/STRUMSEQ/African",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Afro_Beats_Groove.strumseq": {
+              "name": "Afro_Beats_Groove.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Beats_Groove.strumseq",
+              "type": "file"
+            },
+            "Afro_Highlife_Pick.strumseq": {
+              "name": "Afro_Highlife_Pick.strumseq",
+              "path": "assets/STRUMSEQ/African/Afro_Highlife_Pick.strumseq",
+              "type": "file"
+            }
+          }
+        },
         "Ballad": {
           "name": "Ballad",
           "path": "assets/STRUMSEQ/Ballad",
@@ -6419,6 +6709,54 @@
             "Gentle_Arp_Roll.strumseq": {
               "name": "Gentle_Arp_Roll.strumseq",
               "path": "assets/STRUMSEQ/Ballad/Gentle_Arp_Roll.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Blues": {
+          "name": "Blues",
+          "path": "assets/STRUMSEQ/Blues",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Slow_12_8_Blues.strumseq": {
+              "name": "Slow_12_8_Blues.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Slow_12_8_Blues.strumseq",
+              "type": "file"
+            },
+            "Texas_Shuffle.strumseq": {
+              "name": "Texas_Shuffle.strumseq",
+              "path": "assets/STRUMSEQ/Blues/Texas_Shuffle.strumseq",
+              "type": "file"
+            }
+          }
+        },
+        "Country": {
+          "name": "Country",
+          "path": "assets/STRUMSEQ/Country",
+          "type": "directory",
+          "children": [
+            {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "Country_Train_Strum.strumseq": {
+              "name": "Country_Train_Strum.strumseq",
+              "path": "assets/STRUMSEQ/Country/Country_Train_Strum.strumseq",
               "type": "file"
             }
           }
@@ -6559,12 +6897,22 @@
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
               "type": "file"
+            },
+            {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
+              "type": "file"
             }
           ],
           "list": {
             "Bossa_Nova.strumseq": {
               "name": "Bossa_Nova.strumseq",
               "path": "assets/STRUMSEQ/Latin/Bossa_Nova.strumseq",
+              "type": "file"
+            },
+            "Flamenco_Rumba.strumseq": {
+              "name": "Flamenco_Rumba.strumseq",
+              "path": "assets/STRUMSEQ/Latin/Flamenco_Rumba.strumseq",
               "type": "file"
             }
           }

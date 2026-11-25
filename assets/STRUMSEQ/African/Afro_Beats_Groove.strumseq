@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pattern Name="Afro Beats Groove" Category="African" BPM="104" TimeSignature="4/4" Steps="16">
+  <Note Begin="1" End="2" Velocity="104" Note="74"/>
+  <Note Begin="3" End="3" Velocity="68" Note="79"/>
+  <Note Begin="4" End="5" Velocity="112" Note="76"/>
+  <Note Begin="7" End="8" Velocity="106" Note="74"/>
+  <Note Begin="9" End="10" Velocity="70" Note="77"/>
+  <Note Begin="11" End="12" Velocity="98" Note="76"/>
+  <Note Begin="13" End="14" Velocity="110" Note="74"/>
+  <Note Begin="15" End="16" Velocity="88" Note="76"/>
+</Pattern>

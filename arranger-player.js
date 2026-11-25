@@ -80,6 +80,8 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
     }
 
     strummer.externalClockLocked = true;
+	strummer.setVariationIndex?.(0);	
+	
     barStartTime = startTime;
     currentVariation = -1;
     altVariation = false;
@@ -154,6 +156,18 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
   }
 
   function setVariation(varNo) {
+    currentVariation = varNo;
+    altVariation = varNo >= 4;
+    strummer.setVariationIndex?.(varNo);
+
+    // Always update the UI Variation buttons (VAR 1-4 / VAR 1-8) even when playing solo guitar
+    document.querySelectorAll('.btn-var').forEach((b, i) => b.classList.toggle('active', i === currentVariation % 4));
+    const altBtn = document.getElementById('btn-arr-x');
+    if (altBtn) {
+      altBtn.setAttribute('aria-pressed', String(altVariation));
+      altBtn.textContent = altVariation ? 'VAR 1-8' : 'VAR 1-4';
+    }
+
     const target = variations[varNo];
     const targetBuf = loopAudioBuffers.drums[target];
     if (!isPlaying || endingScheduled || !targetBuf) return;
@@ -167,7 +181,6 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
     const rate = getRate();
     const fadeTime = Math.min(0.02, (boundary - now) / 2);
 
-    // Clear or fade active drum loops
     activeSources.filter(s => s.loopType === 'drums').forEach(src => {
       if (src.startTime > now) {
         src.stop(now);
@@ -182,7 +195,6 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
     });
     activeSources = activeSources.filter(s => s.loopType !== 'drums' || s.startTime <= now);
 
-    // If Auto-Fill is checked, play the matching fill up to the next bar boundary
     if (fillBuf) {
       const remaining = (boundary - now) * rate;
       const offset = (fillBuf.duration - remaining % fillBuf.duration) % fillBuf.duration;
@@ -191,24 +203,11 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
       activeSources.push(fillNode);
     }
 
-    // Schedule the new variation at the bar boundary
     activeSources.push(triggerLoopNode('drums', targetBuf, rate, boundary, 0, 0, true));
-
-    currentVariation = varNo;
     currentDrumKey = target;
-    altVariation = varNo >= 4;
     variationRequested = true;
-
-    document.querySelectorAll('.btn-var').forEach((b, i) => b.classList.toggle('active', i === currentVariation % 4));
-    const altBtn = document.getElementById('btn-arr-x');
-    if (altBtn) {
-      altBtn.setAttribute('aria-pressed', String(altVariation));
-      altBtn.textContent = altVariation ? 'VAR 1-8' : 'VAR 1-4';
-    }
     changeChord(currentChordType, currentChordRoot, currentBassRoot);
   }
-
-
 
   return {
     setStyleData(newTempo, buffers) {
