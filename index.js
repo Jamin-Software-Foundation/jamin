@@ -7,6 +7,8 @@ import { initMidiAndKeyboard } from './midi-keyboard.js';
 import { createRegistrationManager } from './registrations.js';
 import { createArrangerPlayer } from './arranger-player.js';
 import { createCrkdBridge } from './crkd-bridge.js';
+import { initNeoUke } from './neouke-ble.js';
+
 
 let audioCtx = null, mixer = null, rootDirJson = null, selectedStyleInfo = null, regs = null;
 let styleGroups = new Map();
@@ -178,3 +180,6 @@ regs = createRegistrationManager({
     logger(`Registration ${n} recalled.${missing.length ? ` Missing: ${missing.join(', ')}` : ''}`);
   }
 });
+
+initNeoUke({ arranger, getRegs: () => regs, logger });
+

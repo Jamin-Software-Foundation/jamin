@@ -95,10 +95,15 @@ export class DualGuitarVoice {
     let indices = Array.of(0, 1, 2, 3, 4, 5).filter(i => voicing.strings.at(i) !== null);
 
     if (subset === 'treble' && indices.length > 4) indices = indices.slice(-4);
+	
+    if (subset === 'top3' && indices.length > 3) indices = indices.slice(-3);
+    else if (subset === 'treble' && indices.length > 4) indices = indices.slice(-4);
+
     if (direction === 'up') {
       indices.reverse();
-      if (indices.length > 4) indices = indices.slice(0, 4);
+      if (subset !== 'top3' && indices.length > 4) indices = indices.slice(0, 4);
     }
+
 
     const stepMs = spreadMs / Math.max(1, indices.length - 1);
     indices.forEach((strIdx, order) => {

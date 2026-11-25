@@ -111,8 +111,10 @@ export class CRKDStrummerEngine {
       if (isArpMode && this.lastValidVoicing) {
         this.voice.playPadChord(this.lastValidVoicing);
         this.voice.strumChord(this.lastValidVoicing, {
-          direction, velocity: direction === 'down' ? 100 : 88,
-          spreadMs: direction === 'down' ? 36 : 28, subset: direction === 'down' ? 'all' : 'treble'
+          direction,
+          velocity: direction === 'down' ? 100 : 84,
+          spreadMs: direction === 'down' ? 36 : 22,
+          subset: direction === 'down' ? 'all' : 'top3'
         });
       } else {
         this.committedChordMask = 0;
