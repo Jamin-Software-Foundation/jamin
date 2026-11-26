@@ -16,7 +16,7 @@
 <body>
 
   <h2>SF2 On-Demand Chunker</h2>
-  <p>Pick your project root folder, then select the <code>.sf2</code> file(s) you want to chunk into <code>/assets/SF2/&lt;instrument&gt;/</code>.</p>
+  <p>Pick your project root folder, then select the <code>.sf2</code> file(s) you want to chunk into <code>/assets/VOICES/&lt;instrument&gt;/</code>.</p>
 
   <div class="box">
     <button id="pickDirBtn">1. Select Project Root Folder</button>
@@ -71,7 +71,7 @@
 
       try {
         const assetsDir = await rootDirHandle.getDirectoryHandle('assets', { create: true });
-        const sf2ParentDir = await assetsDir.getDirectoryHandle('SF2', { create: true });
+        const sf2ParentDir = await assetsDir.getDirectoryHandle('VOICES', { create: true });
         const generatedCalls = [];
 
         for (const file of files) {
@@ -85,7 +85,7 @@
             const blob = file.slice(start, end);
             const partName = `part_${String(i).padStart(2, '0')}`;
 
-            status.textContent = `Writing /assets/SF2/${cleanName}/${partName} (${i + 1}/${totalChunks})...`;
+            status.textContent = `Writing /assets/VOICES/${cleanName}/${partName} (${i + 1}/${totalChunks})...`;
 
             const fileHandle = await instDir.getFileHandle(partName, { create: true });
             const writable = await fileHandle.createWritable();
@@ -93,10 +93,10 @@
             await writable.close();
           }
 
-          generatedCalls.push(`const ${cleanName}Buffer = await loadChunkedSF2('./assets/SF2/${cleanName}', ${totalChunks});`);
+          generatedCalls.push(`const ${cleanName}Buffer = await loadChunkedSF2('./assets/VOICES/${cleanName}', ${totalChunks});`);
         }
 
-        status.textContent = `Done! Wrote ${files.length} SoundFont(s) to /assets/SF2/.`;
+        status.textContent = `Done! Wrote ${files.length} SoundFont(s) to /assets/VOICES/.`;
         output.style.display = 'block';
         codeSnippet.textContent = generatedCalls.join('\n');
       } catch (err) {

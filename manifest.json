@@ -6050,237 +6050,295 @@
       "type": "directory",
       "children": [
         {
-          "name": "Acoustic_Guitars_JNv2_4",
-          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "name": "Acoustic Guitars JNv2_4",
+          "path": "assets/VOICES/Acoustic Guitars JNv2_4",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           }
         },
         {
-          "name": "Acoustic_Keys_Intimate",
-          "path": "assets/VOICES/Acoustic_Keys_Intimate",
+          "name": "Acoustic Key Intimate",
+          "path": "assets/VOICES/Acoustic Key Intimate",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             "part_02": {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             "part_03": {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             "part_04": {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             "part_05": {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           }
         },
         {
-          "name": "Gentle_Pad",
-          "path": "assets/VOICES/Gentle_Pad",
+          "name": "Classic Rock Electric",
+          "path": "assets/VOICES/Classic Rock Electric",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Gentle Pad",
+          "path": "assets/VOICES/Gentle Pad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
               "type": "file"
             }
           }
         }
       ],
       "list": {
-        "Acoustic_Guitars_JNv2_4": {
-          "name": "Acoustic_Guitars_JNv2_4",
-          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+        "Acoustic Guitars JNv2_4": {
+          "name": "Acoustic Guitars JNv2_4",
+          "path": "assets/VOICES/Acoustic Guitars JNv2_4",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           }
         },
-        "Acoustic_Keys_Intimate": {
-          "name": "Acoustic_Keys_Intimate",
-          "path": "assets/VOICES/Acoustic_Keys_Intimate",
+        "Acoustic Key Intimate": {
+          "name": "Acoustic Key Intimate",
+          "path": "assets/VOICES/Acoustic Key Intimate",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             "part_02": {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             "part_03": {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             "part_04": {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             "part_05": {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           }
         },
-        "Gentle_Pad": {
-          "name": "Gentle_Pad",
-          "path": "assets/VOICES/Gentle_Pad",
+        "Classic Rock Electric": {
+          "name": "Classic Rock Electric",
+          "path": "assets/VOICES/Classic Rock Electric",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        "Gentle Pad": {
+          "name": "Gentle Pad",
+          "path": "assets/VOICES/Gentle Pad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
               "type": "file"
             }
           }
@@ -12336,237 +12394,295 @@
       "type": "directory",
       "children": [
         {
-          "name": "Acoustic_Guitars_JNv2_4",
-          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+          "name": "Acoustic Guitars JNv2_4",
+          "path": "assets/VOICES/Acoustic Guitars JNv2_4",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           }
         },
         {
-          "name": "Acoustic_Keys_Intimate",
-          "path": "assets/VOICES/Acoustic_Keys_Intimate",
+          "name": "Acoustic Key Intimate",
+          "path": "assets/VOICES/Acoustic Key Intimate",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             "part_02": {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             "part_03": {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             "part_04": {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             "part_05": {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           }
         },
         {
-          "name": "Gentle_Pad",
-          "path": "assets/VOICES/Gentle_Pad",
+          "name": "Classic Rock Electric",
+          "path": "assets/VOICES/Classic Rock Electric",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        {
+          "name": "Gentle Pad",
+          "path": "assets/VOICES/Gentle Pad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
               "type": "file"
             }
           }
         }
       ],
       "list": {
-        "Acoustic_Guitars_JNv2_4": {
-          "name": "Acoustic_Guitars_JNv2_4",
-          "path": "assets/VOICES/Acoustic_Guitars_JNv2_4",
+        "Acoustic Guitars JNv2_4": {
+          "name": "Acoustic Guitars JNv2_4",
+          "path": "assets/VOICES/Acoustic Guitars JNv2_4",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_00",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Guitars_JNv2_4/part_01",
+              "path": "assets/VOICES/Acoustic Guitars JNv2_4/part_01",
               "type": "file"
             }
           }
         },
-        "Acoustic_Keys_Intimate": {
-          "name": "Acoustic_Keys_Intimate",
-          "path": "assets/VOICES/Acoustic_Keys_Intimate",
+        "Acoustic Key Intimate": {
+          "name": "Acoustic Key Intimate",
+          "path": "assets/VOICES/Acoustic Key Intimate",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_00",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_00",
               "type": "file"
             },
             "part_01": {
               "name": "part_01",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_01",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_01",
               "type": "file"
             },
             "part_02": {
               "name": "part_02",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_02",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_02",
               "type": "file"
             },
             "part_03": {
               "name": "part_03",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_03",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_03",
               "type": "file"
             },
             "part_04": {
               "name": "part_04",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_04",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_04",
               "type": "file"
             },
             "part_05": {
               "name": "part_05",
-              "path": "assets/VOICES/Acoustic_Keys_Intimate/part_05",
+              "path": "assets/VOICES/Acoustic Key Intimate/part_05",
               "type": "file"
             }
           }
         },
-        "Gentle_Pad": {
-          "name": "Gentle_Pad",
-          "path": "assets/VOICES/Gentle_Pad",
+        "Classic Rock Electric": {
+          "name": "Classic Rock Electric",
+          "path": "assets/VOICES/Classic Rock Electric",
           "type": "directory",
           "children": [
             {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
               "type": "file"
             }
           ],
           "list": {
             "part_00": {
               "name": "part_00",
-              "path": "assets/VOICES/Gentle_Pad/part_00",
+              "path": "assets/VOICES/Classic Rock Electric/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        "Gentle Pad": {
+          "name": "Gentle Pad",
+          "path": "assets/VOICES/Gentle Pad",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Gentle Pad/part_00",
               "type": "file"
             }
           }
