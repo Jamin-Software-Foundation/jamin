@@ -21,9 +21,15 @@ export function createArrangerPlayer({ getAudio, ensureMixer, strummer, logger }
     src.gainNode.gain.setValueAtTime(0, startTime); src.start(startTime, offset);
     src.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
     src.loopType = loopType; src.startTime = startTime;
-    src.onended = () => { activeSources = activeSources.filter(n => n !== src); };
+    src.onended = () => {
+      activeSources = activeSources.filter(n => n !== src);
+      try { src.disconnect(); } catch {}
+      try { src.gainNode.disconnect(); } catch {}
+      src.buffer = null;
+    };
     return src;
   }
+
 
   function playDrumTransition(fillKey) {
     if (!isPlaying || endingScheduled || !currentDrumKey) return;

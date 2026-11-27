@@ -101,21 +101,33 @@ export async function parseAndLoadKst(buffer, rootDirJson, audioCtx, logger, onP
     }
   }
 
+  const uniqueHandles = [];
+  const seenTaskPaths = new Set();
+  for (const t of tasks) {
+    if (!seenTaskPaths.has(t.handle.path)) {
+      seenTaskPaths.add(t.handle.path);
+      uniqueHandles.push(t.handle);
+    }
+  }
+
   let loadedCount = 0;
-  const totalCount = uniquePaths.size;
+  const totalCount = uniqueHandles.length;
   onProgress(0, totalCount);
 
-  for (const { instrument, key, handle } of tasks) {
-    let decoded = decodedByPath.get(handle.path);
-    if (!decoded) {
-      decoded = await readAudioAsset(handle, audioCtx);
+  const BATCH_SIZE = 4;
+  for (let i = 0; i < uniqueHandles.length; i += BATCH_SIZE) {
+    const batch = uniqueHandles.slice(i, i + BATCH_SIZE);
+    await Promise.all(batch.map(async handle => {
+      const decoded = await readAudioAsset(handle, audioCtx);
       decodedByPath.set(handle.path, decoded);
       loadedCount++;
       onProgress(loadedCount, totalCount);
-    }
-    loopAudioBuffers[instrument][key] = decoded;
+    }));
   }
 
+  for (const { instrument, key, handle } of tasks) {
+    loopAudioBuffers[instrument][key] = decodedByPath.get(handle.path);
+  }
 
 
   // Fallback aliases for missing intro/ending chord & bass files

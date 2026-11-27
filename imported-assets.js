@@ -3,18 +3,36 @@ import "./spessasynth/fflate.js";
 const folders = new Set(['VOICES', 'USER_MODELING', 'USER_STYLE', 'USER_IR']);
 const audioExtension = /\.(wav|ogg|flac)$/i;
 
+let dbPromise = null;
+
 function openDatabase() {
-    return new Promise((resolve, reject) => {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
         const request = indexedDB.open('jamin', 1);
         request.onupgradeneeded = () => {
             request.result.createObjectStore('files');
             request.result.createObjectStore('staging');
         };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-        request.onblocked = () => reject(new Error('IndexedDB upgrade is blocked by another tab.'));
+        request.onsuccess = () => {
+            const db = request.result;
+            db.onversionchange = () => {
+                db.close();
+                dbPromise = null;
+            };
+            resolve(db);
+        };
+        request.onerror = () => {
+            dbPromise = null;
+            reject(request.error);
+        };
+        request.onblocked = () => {
+            dbPromise = null;
+            reject(new Error('IndexedDB upgrade is blocked by another tab.'));
+        };
     });
+    return dbPromise;
 }
+
 
 function transactionDone(transaction) {
     return new Promise((resolve, reject) => {
@@ -95,6 +113,21 @@ export async function importAssets(file, audioContext, progress = () => {}) {
     const seen = new Set();
     try {
         await validateZip(file);
+        const BATCH_LIMIT = 25;
+        let pendingBatch = [];
+
+        const flushBatch = async () => {
+            if (!pendingBatch.length) return;
+            const batch = pendingBatch;
+            pendingBatch = [];
+            const tx = db.transaction('staging', 'readwrite');
+            const store = tx.objectStore('staging');
+            for (const [target, value] of batch) {
+                store.put(value, [id, target]);
+            }
+            await transactionDone(tx);
+        };
+
         const unzip = new fflate.Unzip(entry => {
             if (entry.name.endsWith('/')) return;
             const path = importPath(entry.name);
@@ -119,11 +152,12 @@ export async function importAssets(file, audioContext, progress = () => {}) {
                     const value = /\.wav$/i.test(path)
                         ? await encodeWav(new Uint8Array(await blob.arrayBuffer()), audioContext)
                         : blob;
-                    const tx = db.transaction('staging', 'readwrite');
-                    tx.objectStore('staging').put(value, [id, target]);
-                    await transactionDone(tx);
+                    pendingBatch.push([target, value]);
                     count++;
                     progress(`Importing ${count}: ${target}`);
+                    if (pendingBatch.length >= BATCH_LIMIT) {
+                        await flushBatch();
+                    }
                 });
             };
             entry.start();
@@ -137,7 +171,9 @@ export async function importAssets(file, audioContext, progress = () => {}) {
             if (done) break;
         }
         if (active) throw new Error('The ZIP file is incomplete.');
+        await flushBatch();
         if (!count) throw new Error('ZIP contains no files in VOICES, USER_MODELING or USER_STYLE.');
+
         const tx = db.transaction(['files', 'staging'], 'readwrite');
         const staged = tx.objectStore('staging');
         const files = tx.objectStore('files');
@@ -165,7 +201,6 @@ export async function importAssets(file, audioContext, progress = () => {}) {
         throw error;
     } finally {
         if (stream) stream.releaseLock();
-        db.close();
     }
 }
 
@@ -217,7 +252,7 @@ export async function mergeImportedAssets(root) {
         }
         return root;
     } finally {
-        db.close();
+
     }
 }
 
@@ -238,23 +273,18 @@ export async function readAsset(entry) {
         if (!value) throw new Error(`Imported file not found: ${entry.path}`);
         return (value.blob || value).arrayBuffer();
     } finally {
-        db.close();
+
     }
 }
 
 export async function readAudioAsset(entry, audioContext) {
     if (!entry.imported) return audioContext.decodeAudioData(await readAsset(entry));
     const db = await openDatabase();
-    let value;
-    try {
-        const request = db.transaction('files', 'readonly').objectStore('files').get(entry.path);
-        value = await new Promise((resolve, reject) => {
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    } finally {
-        db.close();
-    }
+    const request = db.transaction('files', 'readonly').objectStore('files').get(entry.path);
+    let value = await new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
     if (!value) throw new Error(`Imported file not found: ${entry.path}`);
     const hasMeta = Boolean(value.blob);
     const sourceFrames = value.frames;
@@ -285,6 +315,6 @@ export async function getImportedIrPaths() {
         const keys = await new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); });
         return keys.filter(k => k.startsWith('USER_IR/'));
     } finally {
-        db.close();
+
     }
 }

@@ -139,7 +139,28 @@ document.getElementById('btn-link-dir').addEventListener('click', initializeAsse
 document.getElementById('btn-scan-sf2').addEventListener('click', () => rootDirJson && voices.scan(rootDirJson.list['VOICES']));
 document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-input').click());
 
-document.getElementById('import-input').addEventListener('change', async e => { if (e.target.files[0]) { await importAssets(e.target.files[0], getAudio(), () => {}); if (rootDirJson) await initializeAssets(); } });
+document.getElementById('import-input').addEventListener('change', async e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const importBtn = document.getElementById('btn-import');
+  const statusEl = document.getElementById('engine-status');
+  importBtn.disabled = true;
+  statusEl.textContent = `Validating ${file.name}...`;
+
+  try {
+    const count = await importAssets(file, getAudio(), msg => {
+      statusEl.textContent = msg;
+    });
+    logger(`Imported ${count} files from ${file.name}.`);
+    if (rootDirJson) await initializeAssets();
+  } catch (err) {
+    logger(`Import failed: ${err.message}`);
+  } finally {
+    importBtn.disabled = false;
+    e.target.value = ''; // Allows re-importing the same file if needed
+  }
+});
 
 document.querySelectorAll('.intro-choice').forEach(b => b.addEventListener('click', () => { arranger.setIntroEnding(Number(b.dataset.intro)); document.querySelectorAll('.intro-choice').forEach(c => c.setAttribute('aria-pressed', String(c === b))); }));
 document.getElementById('btn-play').addEventListener('click', arranger.toggleStartEnd);
