@@ -1,5 +1,5 @@
 // Change this version whenever the app shell or bundled assets change.
-const CACHE_NAME = 'jamin-offline-v1';
+const CACHE_NAME = 'jamin-offline-v1.1';
 const SHELL = [
   './', './index.html', './index.css', './console.css', './console-layout.js',
   './index.js', './arranger-player.js', './crkd-bridge.js', './crkd-gamepad.js',
