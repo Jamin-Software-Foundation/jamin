@@ -256,17 +256,27 @@ export async function readAudioAsset(entry, audioContext) {
         db.close();
     }
     if (!value) throw new Error(`Imported file not found: ${entry.path}`);
-    const decoded = await audioContext.decodeAudioData(await (value.blob || value).arrayBuffer());
-    if (!value.blob) return decoded;
-    const frames = Math.round(value.frames * decoded.sampleRate / value.sampleRate);
+    const hasMeta = Boolean(value.blob);
+    const sourceFrames = value.frames;
+    const sourceSampleRate = value.sampleRate;
+    let arrayBuffer = await (value.blob || value).arrayBuffer();
+    value = null;
+
+    const decoded = await audioContext.decodeAudioData(arrayBuffer);
+    arrayBuffer = null;
+
+    if (!hasMeta) return decoded;
+    const frames = Math.round(sourceFrames * decoded.sampleRate / sourceSampleRate);
     if (decoded.length < frames) throw new Error(`Decoded audio is shorter than its source: ${entry.path}`);
     if (decoded.length === frames) return decoded;
+
     const trimmed = audioContext.createBuffer(decoded.numberOfChannels, frames, decoded.sampleRate);
     for (let i = 0; i < decoded.numberOfChannels; i++) {
         trimmed.copyToChannel(decoded.getChannelData(i).subarray(0, frames), i);
     }
     return trimmed;
 }
+
 
 export async function getImportedIrPaths() {
     const db = await openDatabase();

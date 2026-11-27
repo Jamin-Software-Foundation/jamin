@@ -82,17 +82,52 @@ function renderStyles() {
   window.renderTwoLevel(document.getElementById('kst-items'), styleView, groups, 'No KST styles found.');
 }
 
+let styleLoadToken = 0;
+
 async function selectStyle(entry, genre) {
+  const token = ++styleLoadToken;
   if (arranger.getState().isPlaying) arranger.stopImmediate();
+  arranger.setStyleData(120, { drums: {}, bass: {}, chords: {} });
+
+  const playBtn = document.getElementById('btn-play');
+  playBtn.disabled = true;
+  playBtn.style.background = '';
+
   selectedStyleInfo = { handle: entry, path: genre, name: entry.name };
-  document.getElementById('style-name').textContent = entry.name.replace(/\.kst$/i, ''); document.getElementById('style-category').textContent = genre; renderStyles();
-  const loaded = await parseAndLoadKst(await readAsset(entry), rootDirJson, getAudio(), logger);
-  arranger.setStyleData(loaded.tempo, loaded.loopAudioBuffers);
-  const effectiveBpm = Math.ceil(loaded.tempo * Math.pow(2, Number(tempoInput.value) / 12));
-  rigBridge?.syncTempo(effectiveBpm);
-  
-  document.getElementById('btn-play').disabled = false; document.getElementById('btn-play').style.background = '#ff3d00';
+  document.getElementById('style-name').textContent = entry.name.replace(/\.kst$/i, '');
+  document.getElementById('style-category').textContent = genre;
+  renderStyles();
+
+  try {
+    const statusEl = document.getElementById('engine-status');
+    const styleLabel = entry.name.replace(/\.kst$/i, '');
+    statusEl.textContent = `Loading ${styleLabel}...`;
+
+    const loaded = await parseAndLoadKst(
+      await readAsset(entry),
+      rootDirJson,
+      getAudio(),
+      logger,
+      (done, total) => {
+        if (token !== styleLoadToken) return;
+        const pct = total ? Math.round((done / total) * 100) : 100;
+        statusEl.textContent = `Loading ${styleLabel}: ${done}/${total} (${pct}%)`;
+      }
+    );
+    if (token !== styleLoadToken) return;
+    arranger.setStyleData(loaded.tempo, loaded.loopAudioBuffers);
+    const effectiveBpm = Math.ceil(loaded.tempo * Math.pow(2, Number(tempoInput.value) / 12));
+    rigBridge?.syncTempo(effectiveBpm);
+
+    playBtn.disabled = false;
+    playBtn.style.background = '#ff3d00';
+  } catch (err) {
+    if (token === styleLoadToken) logger(`Error loading style: ${err.message}`);
+    throw err;
+  }
+
 }
+
 
 function syncKeyToVoices() {
   const idx = noteNames.indexOf(keyInput.value); if (idx < 0) return;
@@ -103,7 +138,9 @@ function syncKeyToVoices() {
 document.getElementById('btn-link-dir').addEventListener('click', initializeAssets);
 document.getElementById('btn-scan-sf2').addEventListener('click', () => rootDirJson && voices.scan(rootDirJson.list['VOICES']));
 document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-input').click());
+
 document.getElementById('import-input').addEventListener('change', async e => { if (e.target.files[0]) { await importAssets(e.target.files[0], getAudio(), () => {}); if (rootDirJson) await initializeAssets(); } });
+
 document.querySelectorAll('.intro-choice').forEach(b => b.addEventListener('click', () => { arranger.setIntroEnding(Number(b.dataset.intro)); document.querySelectorAll('.intro-choice').forEach(c => c.setAttribute('aria-pressed', String(c === b))); }));
 document.getElementById('btn-play').addEventListener('click', arranger.toggleStartEnd);
 document.getElementById('btn-stop').addEventListener('click', arranger.stopImmediate);

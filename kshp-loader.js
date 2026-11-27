@@ -40,7 +40,7 @@ export async function scanStyleFolderDeep(json, styleGroups, currentPath = '') {
   }
 }
 
-export async function parseAndLoadKst(buffer, rootDirJson, audioCtx, logger) {
+export async function parseAndLoadKst(buffer, rootDirJson, audioCtx, logger, onProgress = () => {}) {
   const view = new DataView(buffer);
   let extractedBpm = 120;
   for (let i = 0; i < buffer.byteLength - 6; i++) {
@@ -71,14 +71,18 @@ export async function parseAndLoadKst(buffer, rootDirJson, audioCtx, logger) {
   const finalTempo = (Number.isFinite(drumTempo) && drumTempo > 0) ? drumTempo : extractedBpm;
 
   const loopAudioBuffers = { drums: {}, bass: {}, chords: {} };
+  const decodedByPath = new Map();
   const instruments = ['drums', 'bass', 'chords'];
   const handles = [
     [rootDirJson.list['USER_MODELING']?.list['LiveDrum']?.list[drumFolder]],
     bassFolder.map(f => f ? rootDirJson.list['USER_MODELING']?.list['RealBass']?.list[f] : null),
     chordFolder.map(f => f ? rootDirJson.list['USER_MODELING']?.list['RealChord']?.list[f] : null)
   ];
+
   if (!handles[0][0]) throw new Error(`Missing LiveDrum folder: ${drumFolder}`);
 
+  const tasks = [];
+  const uniquePaths = new Set();
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < handles[i].length; j++) {
       const folder = handles[i][j];
@@ -88,12 +92,31 @@ export async function parseAndLoadKst(buffer, rootDirJson, audioCtx, logger) {
           const base = handle.name.toUpperCase().split('.')[0];
           const key = i === 0 ? base : `${j}_${base}`;
           if (!loopAudioBuffers[instruments[i]][key]) {
-            loopAudioBuffers[instruments[i]][key] = await readAudioAsset(handle, audioCtx);
+            loopAudioBuffers[instruments[i]][key] = true; // reserve slot
+            tasks.push({ instrument: instruments[i], key, handle });
+            uniquePaths.add(handle.path);
           }
         }
       }
     }
   }
+
+  let loadedCount = 0;
+  const totalCount = uniquePaths.size;
+  onProgress(0, totalCount);
+
+  for (const { instrument, key, handle } of tasks) {
+    let decoded = decodedByPath.get(handle.path);
+    if (!decoded) {
+      decoded = await readAudioAsset(handle, audioCtx);
+      decodedByPath.set(handle.path, decoded);
+      loadedCount++;
+      onProgress(loadedCount, totalCount);
+    }
+    loopAudioBuffers[instrument][key] = decoded;
+  }
+
+
 
   // Fallback aliases for missing intro/ending chord & bass files
   for (let v = 0; v < 4; v++) {
