@@ -1,6 +1,6 @@
 import "./spessasynth/fflate.js";
 
-const folders = new Set(['VOICES', 'USER_MODELING', 'USER_STYLE']);
+const folders = new Set(['VOICES', 'USER_MODELING', 'USER_STYLE', 'USER_IR']);
 const audioExtension = /\.(wav|ogg|flac)$/i;
 
 function openDatabase() {
@@ -266,4 +266,15 @@ export async function readAudioAsset(entry, audioContext) {
         trimmed.copyToChannel(decoded.getChannelData(i).subarray(0, frames), i);
     }
     return trimmed;
+}
+
+export async function getImportedIrPaths() {
+    const db = await openDatabase();
+    try {
+        const req = db.transaction('files', 'readonly').objectStore('files').getAllKeys();
+        const keys = await new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); });
+        return keys.filter(k => k.startsWith('USER_IR/'));
+    } finally {
+        db.close();
+    }
 }

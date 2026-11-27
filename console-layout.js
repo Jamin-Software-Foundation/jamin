@@ -12,7 +12,7 @@
             <section class="panel-head browse-head" data-browse="style" tabindex="0" role="button"><small>Style / <span id="style-category">No category</span></small><strong id="style-name">SELECT A STYLE</strong><span id="style-tempo"></span> <span id="style-chord"></span></section>
             <section class="panel-head teal browse-head" data-browse="voice1" tabindex="0" role="button"><small>SoundFont / Voice 1</small><strong id="voice1-name">NO VOICE SELECTED</strong></section>
             <section class="panel-head browse-head" data-browse="voice2" tabindex="0" role="button"><small>SoundFont / Voice 2</small><strong id="voice2-name">NO VOICE SELECTED</strong></section>
-            <section class="panel-head"><small>Selected part</small><strong id="selected-voice-label">VOICE 1</strong></section>
+            <section class="panel-head browse-head" data-browse="rig" tabindex="0" role="button"><small>Selected part / Rig</small><strong id="selected-voice-label">VOICE 1</strong></section>
             <section class="panel-body side-left"><div class="action-grid" id="global-actions"></div>
                 <div class="status" id="global-status"></div><p class="status" id="engine-status" role="status">Choose a root folder to begin.</p>
 				<div id="beat-counter-container"></div>				
@@ -30,6 +30,7 @@
 				  </div>
 				</div>
 				<div class="patch-list" id="voice2-browser" hidden></div>
+				<div id="rig-browser" hidden></div>				
 				<div id="style-inspect"></div>
 			</section>
             <section class="panel-body side-right voice-settings"><div class="voice-tools"><button id="select-voice1" class="selected">Voice 1</button><button id="select-voice2">Voice 2</button></div>
@@ -128,8 +129,8 @@
         for (const item of open.items) add(item.label, item.selected ? 'selected' : '', item.onClick, item.title);
     };
 
-	const browserViews = { style: 'style-browser', voice1: 'voice1-split', voice2: 'voice2-browser' };	
-    const browserTitles = { style: 'Styles', voice1: 'Voice 1', voice2: 'Voice 2' };
+	const browserViews = { style: 'style-browser', voice1: 'voice1-split', voice2: 'voice2-browser', rig: 'rig-browser'};	
+    const browserTitles = { style: 'Styles', voice1: 'Voice 1', voice2: 'Voice 2', rig: 'Guitar Pedalboard & IR Cabinet' };
     window.showBrowser = view => {
         for (const [name, id] of Object.entries(browserViews)) {
 			old(id).hidden = name !== view;
@@ -137,7 +138,7 @@
 		}
         old('browser-title').textContent = browserTitles[view];
         document.querySelectorAll('.browse-head').forEach(head => head.classList.toggle('browsing', head.dataset.browse === view));
-        if (view !== 'style') old(`select-${view}`).click();
+		if (view === 'voice1' || view === 'voice2') old(`\select-${view}`).click();	
     };
     document.querySelectorAll('.browse-head').forEach(head => {
         head.addEventListener('click', () => window.showBrowser(head.dataset.browse));

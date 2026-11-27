@@ -751,6 +751,35 @@
       }
     },
     {
+      "name": "USER_IR",
+      "path": "assets/USER_IR",
+      "type": "directory",
+      "children": [
+        {
+          "name": "American Pro 2x12 - Bright - Mix.wav",
+          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
+          "type": "file"
+        },
+        {
+          "name": "Conic Long Echo Hall.wav",
+          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
+          "type": "file"
+        }
+      ],
+      "list": {
+        "American Pro 2x12 - Bright - Mix.wav": {
+          "name": "American Pro 2x12 - Bright - Mix.wav",
+          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
+          "type": "file"
+        },
+        "Conic Long Echo Hall.wav": {
+          "name": "Conic Long Echo Hall.wav",
+          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
+          "type": "file"
+        }
+      }
+    },
+    {
       "name": "USER_MODELING",
       "path": "assets/USER_MODELING",
       "type": "directory",
@@ -6177,6 +6206,115 @@
           }
         },
         {
+          "name": "Electric_Guitar_FSBS_Clean",
+          "path": "assets/VOICES/Electric_Guitar_FSBS_Clean",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            "part_02": {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            "part_03": {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            "part_04": {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            "part_05": {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            "part_06": {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            "part_07": {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            "part_08": {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            "part_09": {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Gentle Pad",
           "path": "assets/VOICES/Gentle Pad",
           "type": "directory",
@@ -6320,6 +6458,115 @@
             "part_01": {
               "name": "part_01",
               "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        "Electric_Guitar_FSBS_Clean": {
+          "name": "Electric_Guitar_FSBS_Clean",
+          "path": "assets/VOICES/Electric_Guitar_FSBS_Clean",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            "part_02": {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            "part_03": {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            "part_04": {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            "part_05": {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            "part_06": {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            "part_07": {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            "part_08": {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            "part_09": {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
               "type": "file"
             }
           }
@@ -7091,6 +7338,35 @@
               "type": "file"
             }
           }
+        }
+      }
+    },
+    "USER_IR": {
+      "name": "USER_IR",
+      "path": "assets/USER_IR",
+      "type": "directory",
+      "children": [
+        {
+          "name": "American Pro 2x12 - Bright - Mix.wav",
+          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
+          "type": "file"
+        },
+        {
+          "name": "Conic Long Echo Hall.wav",
+          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
+          "type": "file"
+        }
+      ],
+      "list": {
+        "American Pro 2x12 - Bright - Mix.wav": {
+          "name": "American Pro 2x12 - Bright - Mix.wav",
+          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
+          "type": "file"
+        },
+        "Conic Long Echo Hall.wav": {
+          "name": "Conic Long Echo Hall.wav",
+          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
+          "type": "file"
         }
       }
     },
@@ -12521,6 +12797,115 @@
           }
         },
         {
+          "name": "Electric_Guitar_FSBS_Clean",
+          "path": "assets/VOICES/Electric_Guitar_FSBS_Clean",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            "part_02": {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            "part_03": {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            "part_04": {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            "part_05": {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            "part_06": {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            "part_07": {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            "part_08": {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            "part_09": {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          }
+        },
+        {
           "name": "Gentle Pad",
           "path": "assets/VOICES/Gentle Pad",
           "type": "directory",
@@ -12664,6 +13049,115 @@
             "part_01": {
               "name": "part_01",
               "path": "assets/VOICES/Classic Rock Electric/part_01",
+              "type": "file"
+            }
+          }
+        },
+        "Electric_Guitar_FSBS_Clean": {
+          "name": "Electric_Guitar_FSBS_Clean",
+          "path": "assets/VOICES/Electric_Guitar_FSBS_Clean",
+          "type": "directory",
+          "children": [
+            {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
+              "type": "file"
+            }
+          ],
+          "list": {
+            "part_00": {
+              "name": "part_00",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_00",
+              "type": "file"
+            },
+            "part_01": {
+              "name": "part_01",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_01",
+              "type": "file"
+            },
+            "part_02": {
+              "name": "part_02",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_02",
+              "type": "file"
+            },
+            "part_03": {
+              "name": "part_03",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_03",
+              "type": "file"
+            },
+            "part_04": {
+              "name": "part_04",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_04",
+              "type": "file"
+            },
+            "part_05": {
+              "name": "part_05",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_05",
+              "type": "file"
+            },
+            "part_06": {
+              "name": "part_06",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_06",
+              "type": "file"
+            },
+            "part_07": {
+              "name": "part_07",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_07",
+              "type": "file"
+            },
+            "part_08": {
+              "name": "part_08",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_08",
+              "type": "file"
+            },
+            "part_09": {
+              "name": "part_09",
+              "path": "assets/VOICES/Electric_Guitar_FSBS_Clean/part_09",
               "type": "file"
             }
           }
