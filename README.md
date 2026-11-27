@@ -2,6 +2,24 @@
 
 A browser-based audio-loop arranger with a live dual-voice SoundFont strummer and arpeggiator engine.
 
+## Offline use
+
+Open Jamin over HTTPS or localhost while connected and keep the page open until
+the Global status says **Offline ready**. The first download includes all
+bundled sounds (about 927 MB in this checkout) and needs sufficient browser
+storage. A connection is required for the initial download and updates; an
+incomplete download is not offline-ready. If preparation fails, check the
+connection and storage, then reload to retry. Browser storage eviction or
+clearing site data removes the offline copy and imported files.
+
+After preparation, reopen the same URL offline. Imported assets remain in the
+browser's local IndexedDB; hardware features still require compatible devices,
+browser support and any required permissions. Offline updates may wait until
+all Jamin tabs are closed. To deploy an update, increment `CACHE_NAME` in
+`service-worker.js` whenever the app shell or bundled assets change, and keep
+its shell list and `manifest.json` in sync with the deployed files. Files
+listed in the manifest must actually be deployed.
+
 ## Guitar gamepad & live strummer
 
 Connect the CRKD multi-platform Les Paul USB receiver, select PC and guitar
