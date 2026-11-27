@@ -754,30 +754,8 @@
       "name": "USER_IR",
       "path": "assets/USER_IR",
       "type": "directory",
-      "children": [
-        {
-          "name": "American Pro 2x12 - Bright - Mix.wav",
-          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
-          "type": "file"
-        },
-        {
-          "name": "Conic Long Echo Hall.wav",
-          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
-          "type": "file"
-        }
-      ],
-      "list": {
-        "American Pro 2x12 - Bright - Mix.wav": {
-          "name": "American Pro 2x12 - Bright - Mix.wav",
-          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
-          "type": "file"
-        },
-        "Conic Long Echo Hall.wav": {
-          "name": "Conic Long Echo Hall.wav",
-          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
-          "type": "file"
-        }
-      }
+      "children": [],
+      "list": {}
     },
     {
       "name": "USER_MODELING",
@@ -7345,30 +7323,8 @@
       "name": "USER_IR",
       "path": "assets/USER_IR",
       "type": "directory",
-      "children": [
-        {
-          "name": "American Pro 2x12 - Bright - Mix.wav",
-          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
-          "type": "file"
-        },
-        {
-          "name": "Conic Long Echo Hall.wav",
-          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
-          "type": "file"
-        }
-      ],
-      "list": {
-        "American Pro 2x12 - Bright - Mix.wav": {
-          "name": "American Pro 2x12 - Bright - Mix.wav",
-          "path": "assets/USER_IR/American Pro 2x12 - Bright - Mix.wav",
-          "type": "file"
-        },
-        "Conic Long Echo Hall.wav": {
-          "name": "Conic Long Echo Hall.wav",
-          "path": "assets/USER_IR/Conic Long Echo Hall.wav",
-          "type": "file"
-        }
-      }
+      "children": [],
+      "list": {}
     },
     "USER_MODELING": {
       "name": "USER_MODELING",
