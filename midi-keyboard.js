@@ -8,12 +8,21 @@ export function initMidiAndKeyboard({ getAudio, voices, mixer, mixerState, callb
   const activeNotes = new Map();
   let chordTimer = null;
   let selectedDeviceId = 'all';
+  let midiAccess = null;
 
   function updateKeyVisual(note, state) {
     const el = document.getElementById(`note-${note}`);
     if (!el) return;
     el.classList.remove('active-melody', 'active-chord');
     if (state === 'melody' || state === 'chord') el.classList.add(`active-${state}`);
+  }
+
+  function clearActiveNotes() {
+    for (const note of activeNotes.keys()) {
+      voices.noteOff(note);
+      updateKeyVisual(note, 'off');
+    }
+    activeNotes.clear();
   }
 
   function analyzeHarmony() {
@@ -110,23 +119,55 @@ export function initMidiAndKeyboard({ getAudio, voices, mixer, mixerState, callb
 
   const midiSelect = document.getElementById('midi-input-select');
   if (midiSelect) {
+    midiSelect.disabled = true;
     midiSelect.addEventListener('change', () => {
       selectedDeviceId = midiSelect.value;
-      for (const note of activeNotes.keys()) {
-        voices.noteOff(note);
-        updateKeyVisual(note, 'off');
-      }
-      activeNotes.clear();
+      clearActiveNotes();
       const label = midiSelect.options[midiSelect.selectedIndex]?.textContent || selectedDeviceId;
       logger(`MIDI input target: ${label}`);
     });
   }
 
-  document.getElementById('btn-midi-init').addEventListener('click', async () => {
+  const midiBtn = document.getElementById('btn-midi-init');
+  const badge = document.getElementById('midi-status');
+  midiBtn.textContent = 'MIDI OFF';
+  midiBtn.setAttribute('aria-pressed', 'false');
+
+  function disconnectMidi() {
+    clearActiveNotes();
+    if (midiAccess) {
+      midiAccess.onstatechange = null;
+      for (const input of midiAccess.inputs.values()) {
+        input.onmidimessage = null;
+        if (typeof input.close === 'function') input.close().catch(() => {});
+      }
+      midiAccess = null;
+    }
+    selectedDeviceId = 'all';
+    if (midiSelect) {
+      midiSelect.replaceChildren(new Option('MIDI Input: ALL', 'all'));
+      midiSelect.value = 'all';
+      midiSelect.disabled = true;
+    }
+    midiBtn.classList.remove('active');
+    midiBtn.textContent = 'MIDI OFF';
+    midiBtn.setAttribute('aria-pressed', 'false');
+    badge.innerText = 'MIDI disconnected';
+    badge.style.background = '#555';
+    badge.style.color = '#fff';
+    logger('MIDI OFF.');
+  }
+
+  midiBtn.addEventListener('click', async () => {
+    if (midiAccess) return disconnectMidi();
     if (!navigator.requestMIDIAccess) return logger('Web MIDI not supported in this browser.');
+
     try {
       const access = await navigator.requestMIDIAccess();
-      const connect = () => {
+      midiAccess = access;
+
+      const syncDevices = () => {
+        if (!midiAccess) return;
         const connectedInputs = [];
         for (const input of access.inputs.values()) {
           if (input.state === 'connected') {
@@ -136,6 +177,8 @@ export function initMidiAndKeyboard({ getAudio, voices, mixer, mixerState, callb
                 routeMidi(e.data.at(0), e.data.at(1), e.data.at(2), input.name || '');
               }
             };
+          } else {
+            input.onmidimessage = null;
           }
         }
 
@@ -147,25 +190,32 @@ export function initMidiAndKeyboard({ getAudio, voices, mixer, mixerState, callb
           const stillExists = connectedInputs.some(i => i.id === selectedDeviceId);
           selectedDeviceId = stillExists ? selectedDeviceId : 'all';
           midiSelect.value = selectedDeviceId;
+          midiSelect.disabled = connectedInputs.length === 0;
         }
 
         const count = connectedInputs.length;
-        const badge = document.getElementById('midi-status');
-        badge.innerText = count ? `${count} MIDI input${count === 1 ? '' : 's'} connected` : 'Virtual keyboard';
+        midiBtn.classList.add('active');
+        midiBtn.textContent = 'MIDI ON';
+        midiBtn.setAttribute('aria-pressed', 'true');
+        badge.innerText = count ? `${count} MIDI input${count === 1 ? '' : 's'} connected` : 'No MIDI devices';
         badge.style.background = count ? '#00e676' : '#ffb300';
         badge.style.color = '#000';
-        document.getElementById('btn-midi-init').classList.add('active');
       };
 
-      access.onstatechange = () => {
-        for (const note of activeNotes.keys()) {
-          voices.noteOff(note);
-          updateKeyVisual(note, 'off');
+      access.onstatechange = e => {
+        clearActiveNotes();
+        syncDevices();
+        if (e?.port?.type === 'input') {
+          const stateText = e.port.state === 'connected' ? 'connected' : 'disconnected';
+          logger(`MIDI device ${stateText}: ${e.port.name || e.port.id}`);
         }
-        activeNotes.clear();
-        connect();
       };
-      connect();
-    } catch (err) { logger(`MIDI init failed: ${err.message}`); }
+
+      syncDevices();
+      logger('MIDI ON.');
+    } catch (err) {
+      midiAccess = null;
+      logger(`MIDI init failed: ${err.message}`);
+    }
   });
 }
