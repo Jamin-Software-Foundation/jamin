@@ -1,16 +1,37 @@
 # Jamin
 
-A browser-based audio-loop arranger with a live dual-voice SoundFont strummer and arpeggiator engine.
+A static, browser-based audio arranger with loop playback, two SoundFont voices,
+MIDI and gamepad control, and a live guitar strummer. The application runs
+directly from its source files; it has no build step.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the module dependency map, data
+storage boundaries, and Mermaid diagrams of the main workflows.
+
+## Run and test
+
+Serve the repository root over localhost or HTTPS, then open it in a
+Web-Audio-capable browser. The browser loads `index.html`, which assembles the
+console UI and starts the application. For example, from the repository root:
+
+```sh
+python3 -m http.server 8000
+```
+
+Open `http://localhost:8000/`. Hardware input requires browser support and
+device permissions. Install the Node dependencies and run the regression tests
+with `npm install` and `npm test`; these are for development and are not needed
+to run the app.
 
 ## Offline use
 
 Open Jamin over HTTPS or localhost while connected and keep the page open until
-the Global status says **Offline ready**. The first download includes all
-bundled sounds (about 927 MB in this checkout) and needs sufficient browser
-storage. A connection is required for the initial download and updates; an
-incomplete download is not offline-ready. If preparation fails, check the
-connection and storage, then reload to retry. Browser storage eviction or
-clearing site data removes the offline copy and imported files.
+the Global status says **Offline ready**. The service worker downloads the app
+shell and all bundled files listed in `manifest.json` (about 928 MB in this
+checkout), so sufficient browser storage is required. A connection is required
+for the initial download and updates; an incomplete download is not
+offline-ready. If preparation fails, check the connection and storage, then
+reload to retry. Browser storage eviction or clearing site data removes the
+offline copy and imported files.
 
 After preparation, reopen the same URL offline. Imported assets remain in the
 browser's local IndexedDB; hardware features still require compatible devices,
@@ -23,11 +44,11 @@ listed in the manifest must actually be deployed.
 ## Guitar gamepad & live strummer
 
 Connect the CRKD multi-platform Les Paul USB receiver, select PC and guitar
-default mode (not KEYJAM or Festival), then press **Enable guitar**. Press a
-controller button if the browser has not yet exposed it. The first standard
-gamepad is used until disconnected; disable other gamepads to avoid selecting
-the wrong device. Browser/OS support for the Gamepad API and its standard
-mapping is required.
+default mode (not KEYJAM or Festival), then press **Guitar Off** to enable the
+input (the button changes to **Guitar On**). Press a controller button if the
+browser has not yet exposed it. The first standard gamepad is used until
+disconnected; disable other gamepads to avoid selecting the wrong device.
+Browser/OS support for the Gamepad API and its standard mapping is required.
 
 ### Playing chords, strums & dual voices
 Pressing fret combinations stages the next chord relative to the arranger key;
@@ -107,11 +128,12 @@ different button layouts.
 ## Importing assets
 
 Use **Import** in Global to select a ZIP containing any of `USER_STYLE`,
-`USER_MODELING`, `VOICES`, and `STRUMSEQ` (optionally inside a parent folder).
-Styles are `.KST` files; modeling folders contain audio loops; voices can be
-`.sf2` files or folders of consecutive `part_00`, `part_01`, ... SoundFont chunks;
-and `STRUMSEQ` folders contain Ample Sound `.strumseq` XML pattern files (which
-can also be browsed in the lower half of the **Voice 1** panel).
+`USER_MODELING`, `USER_IR`, `VOICES`, and `STRUMSEQ` (optionally inside a parent
+folder). Styles are `.KST` files; modeling folders contain audio loops; IR
+folders contain impulse responses; voices can be `.sf2` files or folders of
+consecutive `part_00`, `part_01`, ... SoundFont chunks; and `STRUMSEQ` folders
+contain Ample Sound `.strumseq` XML pattern files (which can also be browsed in
+the lower half of the **Voice 1** panel).
 
 Imports are stored per file in the browser's `jamin` IndexedDB and are merged
 with the read-only assets when **ON** is pressed. Importing while ON refreshes
